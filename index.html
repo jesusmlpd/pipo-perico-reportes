@@ -317,11 +317,14 @@ function barChart(el, groups){
   const W=480,H=210,P={l:60,r:8,t:12,b:26};
   const all = groups.flatMap(g=>g.vals.map(x=>x.v));
   let max=Math.max(0,...all), min=Math.min(0,...all);
-  const pad=(max-min)*.1||1; if(max>0) max+=pad; if(min<0) min-=pad;
+  // Escala con números redondos (250, 500, 1,000...)
+  const raw=(max-min)/4||1, mag=Math.pow(10,Math.floor(Math.log10(raw))), tick=[1,2,2.5,5,10].map(m=>m*mag).find(t=>t>=raw);
+  max=Math.ceil(max/tick)*tick; min=Math.floor(min/tick)*tick;
+  const nTicks=Math.round((max-min)/tick);
   const iw=W-P.l-P.r, ih=H-P.t-P.b, step=iw/groups.length;
   const y = v => P.t + (max-v)/(max-min)*ih;
   let g="";
-  for(let i=0;i<=4;i++){ const v=min+(max-min)*i/4, yy=y(v);
+  for(let i=0;i<=nTicks;i++){ const v=min+tick*i, yy=y(v);
     g+=`<line x1="${P.l}" x2="${W-P.r}" y1="${yy}" y2="${yy}" stroke="#efe9db"/><text x="${P.l-6}" y="${yy+4}" text-anchor="end">${money(v,0)}</text>`; }
   g+=`<line x1="${P.l}" x2="${W-P.r}" y1="${y(0)}" y2="${y(0)}" stroke="#9c978a"/>`;
   let marks="";
