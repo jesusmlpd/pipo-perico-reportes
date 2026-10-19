@@ -157,12 +157,12 @@
 
 <script>
 /* ================== CONFIGURACIÓN ==================
-   1. Pega aquí el ID de tu Google Sheet (lo que va entre /d/ y /edit en la URL).
-   2. El Sheet debe estar compartido como "Cualquier persona con el enlace: Lector".
-   3. Pestañas esperadas: "Semanas" y "Anuncios" (ver README.md).
-   Para probar otro Sheet sin editar: ?sheet=ID_DEL_SHEET en la URL.            */
+   El Google Sheet se queda PRIVADO. Un Apps Script dentro del Sheet
+   (apps-script.gs) entrega solo las pestañas "Semanas" y "Anuncios".
+   1. Pega aquí la URL del Apps Script (termina en /exec). Ver README.md.
+   Para probar sin editar: ?api=URL_DEL_SCRIPT en la URL.                        */
 const CONFIG = {
-  SHEET_ID: "",
+  API_URL: "",
   TAB_WEEKS: "Semanas",
   TAB_ADS: "Anuncios",
   GOAL_SALES: 100,
@@ -183,7 +183,7 @@ const T = {
       goalDone:g=>`¡Meta de ${g} ventas cumplida!`,
       updated:t=>`Actualizado ${t}`,
       demo:"<b>Datos de ejemplo.</b> Esta página todavía no está conectada a un Google Sheet, los números de abajo no son reales.",
-      error:"<b>No se pudo leer el Google Sheet.</b> Revisa que esté compartido como “Cualquier persona con el enlace: Lector” y que las pestañas se llamen Semanas y Anuncios.",
+      error:"<b>No se pudo leer el Google Sheet.</b> Revisa que el Apps Script esté implementado con acceso “Cualquier persona” y que las pestañas se llamen Semanas y Anuncios.",
       h:{week:"Semana",spend:"Inversión",sales:"Ventas",revenue:"Ingresos",cpa:"Costo/venta",roas:"ROAS",ctr:"CTR",ad:"Anuncio",clicks:"Clics",impr:"Impresiones",total:"Total"},
       none:"Sin datos todavía.",sales1:"ventas",cpa1:"costo por venta"},
   en:{title:"Ad report",loading:"Loading data…",refresh:"Refresh",
@@ -197,7 +197,7 @@ const T = {
       goalDone:g=>`Goal of ${g} sales reached!`,
       updated:t=>`Updated ${t}`,
       demo:"<b>Sample data.</b> This page is not connected to a Google Sheet yet, the numbers below are not real.",
-      error:"<b>Could not read the Google Sheet.</b> Check it is shared as “Anyone with the link: Viewer” and the tabs are named Semanas and Anuncios.",
+      error:"<b>Could not read the Google Sheet.</b> Check the Apps Script is deployed with access “Anyone” and the tabs are named Semanas and Anuncios.",
       h:{week:"Week",spend:"Spend",sales:"Sales",revenue:"Revenue",cpa:"Cost/sale",roas:"ROAS",ctr:"CTR",ad:"Ad",clicks:"Clicks",impr:"Impressions",total:"Total"},
       none:"No data yet.",sales1:"sales",cpa1:"cost per sale"}
 };
@@ -205,7 +205,7 @@ const T = {
 let lang = "es", data = null, mode = "demo", loadedAt = null;
 try { if (localStorage.getItem("pp-lang") === "en") lang = "en"; } catch(e) {}
 
-const sheetId = new URLSearchParams(location.search).get("sheet") || CONFIG.SHEET_ID;
+const apiUrl = new URLSearchParams(location.search).get("api") || CONFIG.API_URL;
 const $ = s => document.querySelector(s);
 const money = (v, d=0) => isFinite(v) ? v.toLocaleString(lang==="es"?"es-US":"en-US",{style:"currency",currency:CONFIG.CURRENCY,maximumFractionDigits:d,minimumFractionDigits:d}) : "-";
 const num = v => isFinite(v) ? Math.round(v).toLocaleString(lang==="es"?"es-US":"en-US") : "-";
@@ -213,20 +213,7 @@ const pct = v => isFinite(v) ? (v*100).toFixed(2)+"%" : "-";
 const x2 = v => isFinite(v) ? v.toFixed(2)+"x" : "-";
 const div = (a,b) => b ? a/b : NaN;
 
-/* ---------- CSV ---------- */
-function parseCSV(text){
-  const rows=[]; let row=[], cell="", q=false;
-  for(let i=0;i<text.length;i++){
-    const c=text[i];
-    if(q){ if(c=='"'){ if(text[i+1]=='"'){cell+='"';i++;} else q=false; } else cell+=c; }
-    else if(c=='"') q=true;
-    else if(c==",") { row.push(cell); cell=""; }
-    else if(c=="\n"||c=="\r"){ if(c=="\r"&&text[i+1]=="\n") i++; row.push(cell); rows.push(row); row=[]; cell=""; }
-    else cell+=c;
-  }
-  if(cell!==""||row.length){ row.push(cell); rows.push(row); }
-  return rows.filter(r=>r.some(v=>v.trim()!==""));
-}
+/* ---------- Lectura de filas ---------- */
 const norm = s => s.toString().trim().toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z]/g,"");
 const toNum = s => { const v=parseFloat(String(s).replace(/[$,%\s]/g,"")); return isFinite(v)?v:0; };
 
@@ -241,6 +228,7 @@ const ALIASES = {
   clicks:["clics","clicks","clicsenelenlace","linkclicks"]
 };
 function toObjects(rows, labelKey){
+  if(!rows || rows.length<2) return [];
   const head = rows[0].map(norm), idx = {};
   for(const [k,names] of Object.entries(ALIASES)) idx[k] = head.findIndex(h=>names.includes(h));
   return rows.slice(1).map(r=>{
@@ -249,15 +237,6 @@ function toObjects(rows, labelKey){
     return o;
   }).filter(o=>o.label);
 }
-async function fetchTab(tab){
-  const url = `https://docs.google.com/spreadsheets/d/${encodeURIComponent(sheetId)}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(tab)}&_=${Date.now()}`;
-  const res = await fetch(url);
-  if(!res.ok) throw new Error(res.status);
-  const text = await res.text();
-  if(text.trim().startsWith("<")) throw new Error("not shared");
-  return parseCSV(text);
-}
-
 /* ---------- Datos de ejemplo (solo sin Sheet conectado) ---------- */
 function demoData(){
   const w=[["Sep 22",180,4,96,21000,260],["Sep 29",210,6,150,24500,310],["Oct 6",240,9,221,27800,372],["Oct 13",260,11,268,30100,415]];
@@ -268,10 +247,12 @@ function demoData(){
 
 async function load(){
   $("#status").textContent = T[lang].loading;
-  if(!sheetId){ data = demoData(); mode="demo"; loadedAt=new Date(); return render(); }
+  if(!apiUrl){ data = demoData(); mode="demo"; loadedAt=new Date(); return render(); }
   try{
-    const [w,a] = await Promise.all([fetchTab(CONFIG.TAB_WEEKS), fetchTab(CONFIG.TAB_ADS).catch(()=>null)]);
-    data = { weeks: toObjects(w,"week"), ads: a ? toObjects(a,"ad") : [] };
+    const res = await fetch(apiUrl + (apiUrl.includes("?")?"&":"?") + "_=" + Date.now());
+    const j = await res.json();
+    if(j.error || !j[CONFIG.TAB_WEEKS]) throw new Error(j.error || "missing tab");
+    data = { weeks: toObjects(j[CONFIG.TAB_WEEKS],"week"), ads: toObjects(j[CONFIG.TAB_ADS]||[],"ad") };
     mode = "live";
   }catch(e){ console.error(e); mode="error"; data = data || {weeks:[],ads:[]}; }
   loadedAt = new Date(); render();
