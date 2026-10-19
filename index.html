@@ -409,6 +409,7 @@ function delta(now, before, prevLabel, upGood, fmt){
   const d = now - before;
   if(Math.abs(d) < 0.5) return `<span class="delta">igual que ${esc(prevLabel)}</span>`;
   const good = upGood === null ? "" : ((d > 0) === upGood ? "good" : "bad");
+  if(upGood === "better") return `<span class="delta ${d>0?"good":"bad"}">${d>0?"▲":"▼"} ${fmt(Math.abs(d))} ${d>0?"mejor":"peor"} que ${esc(prevLabel)}</span>`;
   return `<span class="delta ${good}">${d>0?"▲":"▼"} ${fmt(Math.abs(d))} ${d>0?"más":"menos"} que ${esc(prevLabel)}</span>`;
 }
 function summaryView(sh){
@@ -426,7 +427,7 @@ function summaryView(sh){
       <div class="kpi" data-go="Shopify"><small>Vendimos</small><b data-count="${f.sold}" data-fmt="money">${money0(f.sold)}</b><em>Shopify ${money0(f.shopIng)} · Amazon ${money0(f.amzIng)}</em>${D("sold",true)}</div>
       <div class="kpi" data-go="Shopify"><small>Gastamos en publicidad</small><b data-count="${f.ads}" data-fmt="money">${money0(f.ads)}</b><em>Shopify ${money0(f.shopMkt)} · Amazon ${money0(f.amzMkt)}</em>${D("ads",false)}</div>
       <div class="kpi" data-go="Amazon"><small>Productos vendidos</small><b data-count="${f.units}" data-fmt="int">${int(f.units)}</b><em>Shopify ${int(f.shopU)} · Amazon ${int(f.amzU)}</em>${D("units",true,int)}</div>
-      <div class="kpi hero ${lost?"loss":""}"><small>${lost?"Perdimos":"Ganamos"}</small><b data-count="${Math.abs(f.res)}" data-fmt="money">${money0(Math.abs(f.res))}</b><em>después de pagar todo</em>${D("res",true)}</div>
+      <div class="kpi hero ${lost?"loss":""}"><small>${lost?"Perdimos":"Ganamos"}</small><b data-count="${Math.abs(f.res)}" data-fmt="money">${money0(Math.abs(f.res))}</b><em>después de pagar todo</em>${D("res","better")}</div>
     </div>
     <p class="period">Incluye Shopify y Amazon después de producto, envíos, comisiones y publicidad.</p>
     <div class="charts">
