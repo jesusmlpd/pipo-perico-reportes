@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pipo Perico Reportes</title>
+<meta name="description" content="Reporte de anuncios de Pipo Perico Hot Sauce para Conmigo Brands LLC.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#fbf6ea">
+<link rel="icon" href="logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Alfa+Slab+One&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#fbf6ea;
+    --card:#ffffff;
+    --ink:#16241b;
+    --muted:#6b6f63;
+    --line:#e7dfcc;
+    --green:#1f4d33;
+    --red:#d2372a;
+    --sun:#f2a516;
+    --cream:#f6e6c4;
+    --display:"Alfa Slab One",Georgia,serif;
+    --sans:"Inter",-apple-system,BlinkMacSystemFont,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1040px;margin:0 auto;padding:28px 16px 64px}
+
+  .top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:28px}
+  .brand{display:flex;align-items:center;gap:14px}
+  .brand img{height:64px;width:auto}
+  .brand small{display:block;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .brand b{font-family:var(--display);font-weight:400;font-size:22px;color:var(--green);line-height:1.1}
+  .lang{display:flex;border:1px solid var(--green);border-radius:999px;padding:3px;flex-shrink:0}
+  .lang button{font:600 11px var(--sans);letter-spacing:.08em;border:0;background:transparent;color:var(--muted);padding:4px 11px;border-radius:999px;cursor:pointer}
+  .lang button.on{background:var(--green);color:var(--cream)}
+
+  h1{font-family:var(--display);font-weight:400;font-size:clamp(30px,6vw,48px);line-height:1.05;color:var(--green);margin-bottom:8px}
+  .meta{display:flex;flex-wrap:wrap;align-items:center;gap:10px;color:var(--muted);font-size:13px;margin-bottom:24px}
+  .meta button{font:600 12px var(--sans);border:1px solid var(--green);background:transparent;color:var(--green);border-radius:999px;padding:4px 12px;cursor:pointer}
+  .meta button:hover{background:var(--green);color:var(--cream)}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--muted);display:inline-block}
+  .dot.live{background:#2e9b5a}
+
+  .banner{background:var(--cream);border:1px solid var(--sun);border-radius:12px;padding:12px 16px;font-size:14px;margin-bottom:24px}
+  .banner.err{background:#fde8e5;border-color:var(--red)}
+  .banner[hidden]{display:none}
+
+  .goal{background:var(--green);color:var(--cream);border-radius:16px;padding:20px 22px;margin-bottom:16px}
+  .goal-row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+  .goal .big{font-family:var(--display);font-size:clamp(40px,8vw,64px);line-height:1}
+  .goal .big span{font-size:.45em;opacity:.75}
+  .goal p{font-size:14px;opacity:.85}
+  .bar{height:12px;background:rgba(246,230,196,.2);border-radius:999px;margin-top:14px;overflow:hidden}
+  .bar i{display:block;height:100%;background:var(--sun);border-radius:999px;width:0;transition:width .6s ease}
+
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:32px}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+  .kpi small{display:block;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+  .kpi b{display:block;font-size:26px;font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums}
+  .kpi em{font-style:normal;font-size:12px;color:var(--muted)}
+
+  h2{font-family:var(--display);font-weight:400;font-size:24px;color:var(--green);margin:0 0 4px}
+  .hint{color:var(--muted);font-size:13px;margin-bottom:14px}
+  section{margin-bottom:36px}
+  .charts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .chart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;position:relative}
+  .chart h3{font-size:14px;font-weight:600;margin-bottom:8px}
+  .chart svg{width:100%;height:auto;display:block;overflow:visible}
+  .chart svg text{font-family:var(--sans);font-size:11px;fill:var(--muted)}
+  .chart .hit{fill:transparent;cursor:default}
+  .chart .mk{transition:opacity .15s}
+  .tip{position:absolute;pointer-events:none;background:var(--ink);color:#fff;font-size:12px;padding:6px 9px;border-radius:8px;white-space:nowrap;transform:translate(-50%,-110%);opacity:0;transition:opacity .1s}
+  .tip b{display:block;font-weight:600}
+
+  .tbl{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:14px}
+  table{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+  th,td{text-align:right;padding:10px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
+  th:first-child,td:first-child{text-align:left}
+  th{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;background:#fdfaf2}
+  tr:last-child td{border-bottom:0}
+  tfoot td{font-weight:700;border-top:2px solid var(--line)}
+  .empty{padding:18px;color:var(--muted);font-size:14px}
+
+  footer{border-top:1px solid var(--line);padding-top:16px;font-size:12px;color:var(--muted)}
+
+  @media (max-width:760px){
+    .kpis{grid-template-columns:repeat(2,1fr)}
+    .charts{grid-template-columns:1fr}
+    .brand img{height:52px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="brand">
+      <img src="logo.png" alt="Pipo Perico Hot Sauce">
+      <div><small>Conmigo Brands LLC</small><b>Pipo Perico</b></div>
+    </div>
+    <div class="lang" role="group" aria-label="Idioma">
+      <button data-lang="es" class="on">ES</button>
+      <button data-lang="en">EN</button>
+    </div>
+  </header>
+
+  <h1 data-i18n="title">Reporte de anuncios</h1>
+  <div class="meta">
+    <span class="dot" id="dot"></span>
+    <span id="status" data-i18n="loading">Cargando datos…</span>
+    <button id="reload" data-i18n="refresh">Actualizar</button>
+  </div>
+
+  <div class="banner" id="banner" hidden></div>
+
+  <div class="goal">
+    <div class="goal-row">
+      <div class="big" id="g-sales">0 <span>/ 100</span></div>
+      <p id="g-text"></p>
+    </div>
+    <div class="bar"><i id="g-bar"></i></div>
+  </div>
+
+  <div class="kpis">
+    <div class="kpi"><small data-i18n="k_spend">Inversión</small><b id="k-spend">-</b><em data-i18n="k_spend_n">total en anuncios</em></div>
+    <div class="kpi"><small data-i18n="k_cpa">Costo por venta</small><b id="k-cpa">-</b><em data-i18n="k_cpa_n">inversión ÷ ventas</em></div>
+    <div class="kpi"><small data-i18n="k_roas">ROAS</small><b id="k-roas">-</b><em data-i18n="k_roas_n">ingresos ÷ inversión</em></div>
+    <div class="kpi"><small data-i18n="k_ctr">CTR</small><b id="k-ctr">-</b><em data-i18n="k_ctr_n">clics ÷ impresiones</em></div>
+  </div>
+
+  <section>
+    <h2 data-i18n="s_trend">Por semana</h2>
+    <p class="hint" data-i18n="s_trend_h">Pasa el cursor sobre cada barra o punto para ver el número.</p>
+    <div class="charts">
+      <div class="chart"><h3 data-i18n="c_sales">Ventas por semana</h3><div id="c-sales"></div><div class="tip"></div></div>
+      <div class="chart"><h3 data-i18n="c_cpa">Costo por venta por semana</h3><div id="c-cpa"></div><div class="tip"></div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2 data-i18n="s_weeks">Detalle semanal</h2>
+    <div class="tbl" id="t-weeks"></div>
+  </section>
+
+  <section>
+    <h2 data-i18n="s_ads">Anuncios</h2>
+    <p class="hint" data-i18n="s_ads_h">Ordenados por ventas. El costo por venta más bajo es el mejor.</p>
+    <div class="tbl" id="t-ads"></div>
+  </section>
+
+  <footer data-i18n="foot">Datos tomados en vivo de Google Sheets. Preparado por KOS para Conmigo Brands LLC.</footer>
+</div>
+
+<script>
+/* ================== CONFIGURACIÓN ==================
+   1. Pega aquí el ID de tu Google Sheet (lo que va entre /d/ y /edit en la URL).
+   2. El Sheet debe estar compartido como "Cualquier persona con el enlace: Lector".
+   3. Pestañas esperadas: "Semanas" y "Anuncios" (ver README.md).
+   Para probar otro Sheet sin editar: ?sheet=ID_DEL_SHEET en la URL.            */
+const CONFIG = {
+  SHEET_ID: "",
+  TAB_WEEKS: "Semanas",
+  TAB_ADS: "Anuncios",
+  GOAL_SALES: 100,
+  CURRENCY: "USD",
+  REFRESH_MIN: 5
+};
+/* =================================================== */
+
+const T = {
+  es:{title:"Reporte de anuncios",loading:"Cargando datos…",refresh:"Actualizar",
+      k_spend:"Inversión",k_spend_n:"total en anuncios",k_cpa:"Costo por venta",k_cpa_n:"inversión ÷ ventas",
+      k_roas:"ROAS",k_roas_n:"ingresos ÷ inversión",k_ctr:"CTR",k_ctr_n:"clics ÷ impresiones",
+      s_trend:"Por semana",s_trend_h:"Pasa el cursor sobre cada barra o punto para ver el número.",
+      c_sales:"Ventas por semana",c_cpa:"Costo por venta por semana",s_weeks:"Detalle semanal",
+      s_ads:"Anuncios",s_ads_h:"Ordenados por ventas. El costo por venta más bajo es el mejor.",
+      foot:"Datos tomados en vivo de Google Sheets. Preparado por KOS para Conmigo Brands LLC.",
+      goal:(n,g)=>`ventas de la meta de ${g}. Faltan ${Math.max(g-n,0)}.`,
+      goalDone:g=>`¡Meta de ${g} ventas cumplida!`,
+      updated:t=>`Actualizado ${t}`,
+      demo:"<b>Datos de ejemplo.</b> Esta página todavía no está conectada a un Google Sheet, los números de abajo no son reales.",
+      error:"<b>No se pudo leer el Google Sheet.</b> Revisa que esté compartido como “Cualquier persona con el enlace: Lector” y que las pestañas se llamen Semanas y Anuncios.",
+      h:{week:"Semana",spend:"Inversión",sales:"Ventas",revenue:"Ingresos",cpa:"Costo/venta",roas:"ROAS",ctr:"CTR",ad:"Anuncio",clicks:"Clics",impr:"Impresiones",total:"Total"},
+      none:"Sin datos todavía.",sales1:"ventas",cpa1:"costo por venta"},
+  en:{title:"Ad report",loading:"Loading data…",refresh:"Refresh",
+      k_spend:"Spend",k_spend_n:"total on ads",k_cpa:"Cost per sale",k_cpa_n:"spend ÷ sales",
+      k_roas:"ROAS",k_roas_n:"revenue ÷ spend",k_ctr:"CTR",k_ctr_n:"clicks ÷ impressions",
+      s_trend:"By week",s_trend_h:"Hover each bar or point to see the number.",
+      c_sales:"Sales per week",c_cpa:"Cost per sale per week",s_weeks:"Weekly detail",
+      s_ads:"Ads",s_ads_h:"Sorted by sales. The lowest cost per sale is the best.",
+      foot:"Data pulled live from Google Sheets. Prepared by KOS for Conmigo Brands LLC.",
+      goal:(n,g)=>`sales toward the goal of ${g}. ${Math.max(g-n,0)} to go.`,
+      goalDone:g=>`Goal of ${g} sales reached!`,
+      updated:t=>`Updated ${t}`,
+      demo:"<b>Sample data.</b> This page is not connected to a Google Sheet yet, the numbers below are not real.",
+      error:"<b>Could not read the Google Sheet.</b> Check it is shared as “Anyone with the link: Viewer” and the tabs are named Semanas and Anuncios.",
+      h:{week:"Week",spend:"Spend",sales:"Sales",revenue:"Revenue",cpa:"Cost/sale",roas:"ROAS",ctr:"CTR",ad:"Ad",clicks:"Clicks",impr:"Impressions",total:"Total"},
+      none:"No data yet.",sales1:"sales",cpa1:"cost per sale"}
+};
+
+let lang = "es", data = null, mode = "demo", loadedAt = null;
+try { if (localStorage.getItem("pp-lang") === "en") lang = "en"; } catch(e) {}
+
+const sheetId = new URLSearchParams(location.search).get("sheet") || CONFIG.SHEET_ID;
+const $ = s => document.querySelector(s);
+const money = (v, d=0) => isFinite(v) ? v.toLocaleString(lang==="es"?"es-US":"en-US",{style:"currency",currency:CONFIG.CURRENCY,maximumFractionDigits:d,minimumFractionDigits:d}) : "-";
+const num = v => isFinite(v) ? Math.round(v).toLocaleString(lang==="es"?"es-US":"en-US") : "-";
+const pct = v => isFinite(v) ? (v*100).toFixed(2)+"%" : "-";
+const x2 = v => isFinite(v) ? v.toFixed(2)+"x" : "-";
+const div = (a,b) => b ? a/b : NaN;
+
+/* ---------- CSV ---------- */
+function parseCSV(text){
+  const rows=[]; let row=[], cell="", q=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i];
+    if(q){ if(c=='"'){ if(text[i+1]=='"'){cell+='"';i++;} else q=false; } else cell+=c; }
+    else if(c=='"') q=true;
+    else if(c==",") { row.push(cell); cell=""; }
+    else if(c=="\n"||c=="\r"){ if(c=="\r"&&text[i+1]=="\n") i++; row.push(cell); rows.push(row); row=[]; cell=""; }
+    else cell+=c;
+  }
+  if(cell!==""||row.length){ row.push(cell); rows.push(row); }
+  return rows.filter(r=>r.some(v=>v.trim()!==""));
+}
+const norm = s => s.toString().trim().toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z]/g,"");
+const toNum = s => { const v=parseFloat(String(s).replace(/[$,%\s]/g,"")); return isFinite(v)?v:0; };
+
+/* Lee una pestaña y la convierte en objetos con llaves fijas */
+const ALIASES = {
+  week:["semana","week","fecha","date","periodo"],
+  ad:["anuncio","ad","creativo","nombre","name"],
+  spend:["inversion","spend","gasto","amountspent","costo"],
+  sales:["ventas","sales","compras","purchases","conversiones"],
+  revenue:["ingresos","revenue","valor","purchasevalue","ventasusd"],
+  impr:["impresiones","impressions"],
+  clicks:["clics","clicks","clicsenelenlace","linkclicks"]
+};
+function toObjects(rows, labelKey){
+  const head = rows[0].map(norm), idx = {};
+  for(const [k,names] of Object.entries(ALIASES)) idx[k] = head.findIndex(h=>names.includes(h));
+  return rows.slice(1).map(r=>{
+    const o = { label: (r[idx[labelKey]] ?? r[0] ?? "").trim() };
+    for(const k of ["spend","sales","revenue","impr","clicks"]) o[k] = idx[k]>=0 ? toNum(r[idx[k]]) : 0;
+    return o;
+  }).filter(o=>o.label);
+}
+async function fetchTab(tab){
+  const url = `https://docs.google.com/spreadsheets/d/${encodeURIComponent(sheetId)}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(tab)}&_=${Date.now()}`;
+  const res = await fetch(url);
+  if(!res.ok) throw new Error(res.status);
+  const text = await res.text();
+  if(text.trim().startsWith("<")) throw new Error("not shared");
+  return parseCSV(text);
+}
+
+/* ---------- Datos de ejemplo (solo sin Sheet conectado) ---------- */
+function demoData(){
+  const w=[["Sep 22",180,4,96,21000,260],["Sep 29",210,6,150,24500,310],["Oct 6",240,9,221,27800,372],["Oct 13",260,11,268,30100,415]];
+  const a=[["Video 01 Hook picante",210,10,245,25000,330],["Video 04 Tacos",190,8,196,21000,290],["Video 07 Receta",140,5,122,17000,210],["Video 10 Reto",120,4,98,14000,180],["Video 12 Familia",230,3,74,26400,347]];
+  const m=r=>({label:r[0],spend:r[1],sales:r[2],revenue:r[3],impr:r[4],clicks:r[5]});
+  return {weeks:w.map(m), ads:a.map(m)};
+}
+
+async function load(){
+  $("#status").textContent = T[lang].loading;
+  if(!sheetId){ data = demoData(); mode="demo"; loadedAt=new Date(); return render(); }
+  try{
+    const [w,a] = await Promise.all([fetchTab(CONFIG.TAB_WEEKS), fetchTab(CONFIG.TAB_ADS).catch(()=>null)]);
+    data = { weeks: toObjects(w,"week"), ads: a ? toObjects(a,"ad") : [] };
+    mode = "live";
+  }catch(e){ console.error(e); mode="error"; data = data || {weeks:[],ads:[]}; }
+  loadedAt = new Date(); render();
+}
+
+/* ---------- Gráficas (SVG simple, una serie cada una) ---------- */
+function chart(el, rows, valueOf, fmt, kind){
+  const W=460,H=200,P={l:44,r:8,t:12,b:26};
+  if(!rows.length){ el.innerHTML=`<p class="empty">${T[lang].none}</p>`; return; }
+  const vals = rows.map(valueOf).map(v=>isFinite(v)?v:0);
+  const max = Math.max(...vals,1)*1.1, iw=W-P.l-P.r, ih=H-P.t-P.b, step=iw/rows.length;
+  const y = v => P.t+ih-(v/max)*ih;
+  let g="";
+  for(let i=0;i<=3;i++){ const v=max*i/3, yy=y(v); g+=`<line x1="${P.l}" x2="${W-P.r}" y1="${yy}" y2="${yy}" stroke="#ece6d6"/><text x="${P.l-6}" y="${yy+4}" text-anchor="end">${fmt(v,true)}</text>`; }
+  const every = Math.ceil(rows.length/8);
+  rows.forEach((r,i)=>{ if(i%every===0) g+=`<text x="${P.l+step*i+step/2}" y="${H-8}" text-anchor="middle">${r.label}</text>`; });
+  let marks="";
+  if(kind==="bar"){
+    const bw=Math.min(36,step*.6);
+    rows.forEach((r,i)=>{ const x=P.l+step*i+(step-bw)/2, yy=y(vals[i]), h=P.t+ih-yy;
+      marks+=`<path class="mk" d="M${x},${P.t+ih}V${yy+Math.min(4,h)}q0,-4 4,-4h${bw-8}q4,0 4,4V${P.t+ih}Z" fill="#1f4d33"/>`; });
+  }else{
+    const pts = rows.map((r,i)=>[P.l+step*i+step/2, y(vals[i])]);
+    marks+=`<polyline points="${pts.map(p=>p.join(",")).join(" ")}" fill="none" stroke="#d2372a" stroke-width="2" stroke-linejoin="round"/>`;
+    pts.forEach(p=>marks+=`<circle class="mk" cx="${p[0]}" cy="${p[1]}" r="4.5" fill="#d2372a" stroke="#fff" stroke-width="2"/>`);
+  }
+  const hits = rows.map((r,i)=>`<rect class="hit" data-i="${i}" x="${P.l+step*i}" y="${P.t}" width="${step}" height="${ih}"/>`).join("");
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img">${g}${marks}${hits}</svg>`;
+  const tip = el.parentElement.querySelector(".tip"), svg = el.querySelector("svg");
+  svg.querySelectorAll(".hit").forEach(h=>{
+    h.addEventListener("mouseenter",()=>{
+      const i=+h.dataset.i, b=svg.getBoundingClientRect(), s=b.width/W, pb=el.parentElement.getBoundingClientRect();
+      tip.innerHTML=`<b>${rows[i].label}</b>${fmt(vals[i])}`;
+      tip.style.left=(b.left-pb.left+(P.l+step*i+step/2)*s)+"px";
+      tip.style.top=(b.top-pb.top+y(vals[i])*s)+"px";
+      tip.style.opacity=1;
+      svg.querySelectorAll(".mk").forEach((m,j)=>m.style.opacity=j===i?1:.35);
+    });
+    h.addEventListener("mouseleave",()=>{ tip.style.opacity=0; svg.querySelectorAll(".mk").forEach(m=>m.style.opacity=1); });
+  });
+}
+
+/* ---------- Tablas ---------- */
+function table(el, rows, labelHead, sortBySales){
+  const h=T[lang].h;
+  if(!rows.length){ el.innerHTML=`<p class="empty">${T[lang].none}</p>`; return; }
+  const list = sortBySales ? [...rows].sort((a,b)=>b.sales-a.sales) : rows;
+  const tr = r => `<td>${r.label}</td><td>${money(r.spend)}</td><td>${num(r.sales)}</td><td>${money(r.revenue)}</td><td>${money(div(r.spend,r.sales),2)}</td><td>${x2(div(r.revenue,r.spend))}</td><td>${num(r.impr)}</td><td>${num(r.clicks)}</td><td>${pct(div(r.clicks,r.impr))}</td>`;
+  const tot = rows.reduce((t,r)=>{ for(const k of ["spend","sales","revenue","impr","clicks"]) t[k]+=r[k]; return t; },{label:h.total,spend:0,sales:0,revenue:0,impr:0,clicks:0});
+  el.innerHTML = `<table><thead><tr><th>${labelHead}</th><th>${h.spend}</th><th>${h.sales}</th><th>${h.revenue}</th><th>${h.cpa}</th><th>${h.roas}</th><th>${h.impr}</th><th>${h.clicks}</th><th>${h.ctr}</th></tr></thead><tbody>${list.map(r=>`<tr>${tr(r)}</tr>`).join("")}</tbody><tfoot><tr>${tr(tot)}</tr></tfoot></table>`;
+}
+
+function render(){
+  const t=T[lang];
+  document.documentElement.lang=lang;
+  document.querySelectorAll("[data-i18n]").forEach(e=>{ const v=t[e.dataset.i18n]; if(typeof v==="string") e.textContent=v; });
+  document.querySelectorAll(".lang button").forEach(b=>b.classList.toggle("on",b.dataset.lang===lang));
+  if(!data) return;
+
+  const b=$("#banner");
+  b.hidden = mode==="live"; b.className = "banner"+(mode==="error"?" err":"");
+  b.innerHTML = mode==="error" ? t.error : t.demo;
+  $("#dot").className = "dot"+(mode==="live"?" live":"");
+  $("#status").textContent = loadedAt ? t.updated(loadedAt.toLocaleTimeString(lang==="es"?"es-MX":"en-US",{hour:"numeric",minute:"2-digit"})) : t.loading;
+
+  const W=data.weeks, sum=k=>W.reduce((s,r)=>s+r[k],0);
+  const spend=sum("spend"), sales=sum("sales"), rev=sum("revenue"), impr=sum("impr"), clicks=sum("clicks"), G=CONFIG.GOAL_SALES;
+  $("#g-sales").innerHTML = `${num(sales)} <span>/ ${G}</span>`;
+  $("#g-text").textContent = sales>=G ? t.goalDone(G) : t.goal(sales,G);
+  $("#g-bar").style.width = Math.min(100, sales/G*100)+"%";
+  $("#k-spend").textContent = money(spend);
+  $("#k-cpa").textContent = money(div(spend,sales),2);
+  $("#k-roas").textContent = x2(div(rev,spend));
+  $("#k-ctr").textContent = pct(div(clicks,impr));
+
+  chart($("#c-sales"), W, r=>r.sales, (v,ax)=> ax ? num(v) : `${num(v)} ${t.sales1}`, "bar");
+  chart($("#c-cpa"), W, r=>div(r.spend,r.sales), (v,ax)=> ax ? money(v) : `${money(v,2)} ${t.cpa1}`, "line");
+  table($("#t-weeks"), W, t.h.week, false);
+  table($("#t-ads"), data.ads, t.h.ad, true);
+}
+
+document.querySelectorAll(".lang button").forEach(b=>b.addEventListener("click",()=>{
+  lang=b.dataset.lang; try{localStorage.setItem("pp-lang",lang);}catch(e){} render();
+}));
+$("#reload").addEventListener("click", load);
+load();
+setInterval(load, CONFIG.REFRESH_MIN*60*1000);
+</script>
+</body>
+</html>
