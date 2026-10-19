@@ -15,6 +15,14 @@ El archivo de Drive puede quedar **Restringido**. Push a `main` = deploy (GitHub
 - Si se sube una versión nueva del Excel, usar "Gestionar versiones" o reemplazar el
   archivo existente para que el ID no cambie. Si cambia, actualizar `FILE_ID` en el script.
 
+## Subir reportes
+
+En la página, botón **Subir reporte**: eliges el Excel nuevo (.xlsm o .xlsx) y la clave de admin.
+El script primero valida que se pueda leer, luego reemplaza el contenido del archivo en Drive
+(mismo ID y link) y la página se actualiza sola. La versión anterior queda en
+Drive > clic derecho en el archivo > Gestionar versiones.
+La clave del cliente (`PASSWORD`) solo deja ver; subir pide `ADMIN_PASSWORD`.
+
 ## Conectar (una vez)
 
 1. Entra a https://script.google.com con la cuenta que tiene el archivo > **Nuevo proyecto**.
@@ -22,7 +30,8 @@ El archivo de Drive puede quedar **Restringido**. Push a `main` = deploy (GitHub
 2. Borra el contenido y pega `apps-script.gs`. Guarda.
 3. A la izquierda, **Servicios (+) > Drive API** > Agregar (deja la versión v3).
 4. **Configuración del proyecto (engrane) > Propiedades de la secuencia de comandos** >
-   agrega `PASSWORD` con la clave que darás al cliente.
+   agrega `PASSWORD` (la clave que darás al cliente, solo ver) y
+   `ADMIN_PASSWORD` (tu clave para subir reportes; distinta y larga).
 5. Arriba elige la función `prueba` > **Ejecutar**. Autoriza (Google dirá "app no verificada":
    Avanzado > Ir a Pipo Perico Reportes). En el registro deben salir las 5 pestañas.
 6. **Implementar > Nueva implementación** > tipo **Aplicación web**:

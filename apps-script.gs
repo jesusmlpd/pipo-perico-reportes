@@ -4,6 +4,7 @@
  * Lee el .xlsm tal cual está en Drive cada vez que cambia, lo convierte a una copia
  * temporal para leerlo, la borra, y entrega todas las pestañas visibles en JSON.
  * Solo responde si la clave (propiedad PASSWORD) es correcta.
+ * Subir un reporte nuevo (doPost) pide otra clave: ADMIN_PASSWORD.
  *
  * Requiere: Servicios > Drive API (v3) activado. Ver README.md.
  */
@@ -30,19 +31,47 @@ function doGet(e) {
   }
 }
 
-/* Lee todas las pestañas visibles. Si es Excel, usa una copia temporal en Google Sheets. */
+/* Lee todas las pestañas visibles del archivo de Drive */
 function readWorkbook(file) {
-  let id = file.getId(), tmp = null;
-  if (file.getMimeType() !== MimeType.GOOGLE_SHEETS) {
-    tmp = Drive.Files.create({ name: "_pipo_reporte_tmp", mimeType: MimeType.GOOGLE_SHEETS }, file.getBlob());
-    id = tmp.id;
-  }
+  if (file.getMimeType() === MimeType.GOOGLE_SHEETS) return readSheets(file.getId());
+  return readBlob(file.getBlob());
+}
+
+/* Convierte un Excel a una copia temporal en Google Sheets, la lee y la borra */
+function readBlob(blob) {
+  const tmp = Drive.Files.create({ name: "_pipo_reporte_tmp", mimeType: MimeType.GOOGLE_SHEETS }, blob);
+  try { return readSheets(tmp.id); } finally { Drive.Files.remove(tmp.id); }
+}
+
+function readSheets(id) {
+  return SpreadsheetApp.openById(id).getSheets()
+    .filter(function (s) { return !s.isSheetHidden(); })
+    .map(function (s) { return { name: s.getName(), rows: trim(s.getDataRange().getValues()) }; });
+}
+
+/* Subir reporte: reemplaza el contenido del archivo en Drive (mismo ID y link).
+   Drive guarda la versión anterior en "Gestionar versiones" por si hay que regresar. */
+function doPost(e) {
   try {
-    return SpreadsheetApp.openById(id).getSheets()
-      .filter(function (s) { return !s.isSheetHidden(); })
-      .map(function (s) { return { name: s.getName(), rows: trim(s.getDataRange().getValues()) }; });
-  } finally {
-    if (tmp) Drive.Files.remove(tmp.id);
+    const body = JSON.parse(e.postData.contents);
+    const admin = PropertiesService.getScriptProperties().getProperty("ADMIN_PASSWORD");
+    if (!admin || body.admin !== admin) return json({ error: "unauthorized" });
+    if (!/\.(xlsm|xlsx)$/i.test(body.name || "")) return json({ error: "El archivo debe ser .xlsm o .xlsx" });
+
+    const mime = /\.xlsm$/i.test(body.name) ? "application/vnd.ms-excel.sheet.macroEnabled.12"
+                                            : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+    const blob = Utilities.newBlob(Utilities.base64Decode(body.data), mime, body.name);
+
+    const sheets = readBlob(blob.copyBlob());            // primero valida que se pueda leer
+    if (!sheets.length) return json({ error: "El archivo no tiene pestañas visibles" });
+
+    Drive.Files.update({}, FILE_ID, blob);               // luego reemplaza el archivo
+    const file = DriveApp.getFileById(FILE_ID);
+    const d = { name: file.getName(), updated: file.getLastUpdated().toISOString(), sheets: sheets };
+    CacheService.getScriptCache().put("data", JSON.stringify(d), 21600);
+    return json({ ok: true, sheets: sheets.map(function (s) { return s.name; }) });
+  } catch (err) {
+    return json({ error: String(err.message || err) });
   }
 }
 
