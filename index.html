@@ -59,6 +59,16 @@
   .tabs button{font:600 13px var(--sans);white-space:nowrap;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:7px 15px;cursor:pointer}
   .tabs button.on{background:var(--green);border-color:var(--green);color:var(--cream)}
 
+  .months{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+  .months button{font:700 16px var(--sans);border:2px solid var(--green);background:var(--card);color:var(--green);border-radius:14px;padding:10px 20px;cursor:pointer;min-width:96px}
+  .months button.on{background:var(--sun);border-color:var(--sun);color:var(--ink)}
+  .months-label{font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+  .say{font-size:clamp(18px,2.6vw,22px);font-weight:500;line-height:1.4;margin-bottom:16px}
+  .say b{font-weight:700}
+  .say .neg{color:var(--red)} .say .pos{color:var(--pos)}
+  .kpi.hero.loss{background:var(--red);border-color:var(--red)}
+  details.full{margin-top:8px}
+  details.full summary{cursor:pointer;font-weight:600;color:var(--green);margin-bottom:12px}
   .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
   .kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
   .kpi small{display:block;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
@@ -88,6 +98,25 @@
   thead th{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;background:#fdfaf2;border-bottom:1px solid var(--line)}
   tr.grp td{background:var(--green);color:var(--cream);font-weight:700;font-size:12px;letter-spacing:.06em;text-transform:uppercase;padding:7px 14px}
   tr.tot td{font-weight:700;background:#fff8e1}
+  tr.row{cursor:pointer;transition:background .12s}
+  tr.row:hover td{background:#fbf3dc}
+  tr.row td:first-child::after{content:" ›";color:#c9c2b0;font-weight:700}
+  tr.row.open td:first-child::after{content:" ⌄";color:var(--green)}
+  tr.detail td{background:#fdfaf2;padding:12px 14px 16px}
+  .mini{display:grid;grid-template-columns:auto 1fr auto;gap:6px 10px;align-items:center;max-width:560px;font-size:13px}
+  .mini span{color:var(--muted)}
+  .mini i{display:block;height:14px;border-radius:0 4px 4px 0;background:var(--pos);transition:width .5s ease;width:0}
+  .mini i.neg{background:var(--red)}
+  .mini i.sel{outline:2px solid var(--sun);outline-offset:1px}
+  .mini b{text-align:right;font-variant-numeric:tabular-nums}
+  .delta{display:inline-block;margin-top:6px;font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px;background:#f3eee2;color:var(--muted)}
+  .delta.good{background:#e6f2ea;color:#22603c}
+  .delta.bad{background:#fde8e5;color:#a32a1f}
+  .kpi.hero .delta{background:rgba(255,255,255,.18);color:var(--cream)}
+  .kpi{transition:transform .15s}
+  .kpi:hover{transform:translateY(-2px)}
+  .chart .hit{cursor:pointer}
+  .hint{color:var(--muted);font-size:12px;margin-top:6px}
   td.neg{color:var(--red)}
   td.txt{text-align:left;white-space:normal}
   td.muted{color:#b8b3a6}
@@ -162,6 +191,8 @@
       <p class="res" id="up-res" hidden></p>
     </div>
     <div class="msg" id="msg" hidden></div>
+    <p class="months-label">Elige un mes</p>
+    <div class="months" id="months"></div>
     <nav class="tabs" id="tabs"></nav>
     <div id="view"></div>
     <footer>Datos en vivo del archivo de control en Google Drive. Se revisa solo cada 2 minutos o al subir un reporte nuevo. Preparado por KOS para Conmigo Brands LLC.</footer>
@@ -182,7 +213,8 @@ const CONFIG = {
 
 const $ = s => document.querySelector(s);
 const apiUrl = new URLSearchParams(location.search).get("api") || CONFIG.API_URL;
-const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const clean = s => String(s ?? "").replace(/\s*\u2014\s*/g, ": ").replace(/^:\s*|:\s*$/g, "");
+const esc = s => clean(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const norm = s => String(s ?? "").trim().toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9]/g,"");
 const isNum = v => typeof v === "number" && isFinite(v);
 const blank = v => v === "" || v === null || v === undefined;
@@ -193,7 +225,8 @@ const money = (v, dec=2) => {
 };
 const int = v => isNum(v) ? Math.round(v).toLocaleString("en-US") : "-";
 
-let pw = "", data = null, tab = "Resumen", timer = null;
+let ROWS = [];   // filas con cifras por mes, para la gráfica al tocar una fila
+let pw = "", data = null, tab = "Resumen", month = "todo", timer = null;
 try { pw = sessionStorage.getItem("pp-k") || ""; } catch(e) {}
 
 /* ---------- Carga ---------- */
@@ -296,74 +329,148 @@ function findRow(rows, label, section){
   return null;
 }
 
+/* ---------- Meses ---------- */
+const monthKey = v => MONTH.test(String(v).trim()) ? norm(String(v).trim().split(/\s+/)[0]) : null;
+/* Meses disponibles (de la pestaña Resumen, o de la primera con meses) */
+function monthList(){
+  const src = sheet("Resumen") || data.sheets.find(x => monthCols(x.rows).cols.length);
+  if(!src) return [];
+  const {h, cols} = monthCols(src.rows);
+  return cols.map(c => ({key: monthKey(src.rows[h][c]), label: String(src.rows[h][c]).replace(/\s*20\d\d/,""), full: src.rows[h][c]})).filter(m => m.key);
+}
+/* Columna del mes elegido en una pestaña (o la de Total si es "todo") */
+function colFor(rows){
+  const {h, cols, total} = monthCols(rows);
+  if(h < 0) return -1;
+  if(month === "todo") return total;
+  return cols.find(c => monthKey(rows[h][c]) === month) ?? -1;
+}
+
 /* ---------- Vistas ---------- */
 function render(){
   const upd = data.updated ? new Date(data.updated) : null;
   $("#status").textContent = (upd ? `Archivo modificado ${upd.toLocaleString("es-MX",{day:"numeric",month:"short",hour:"numeric",minute:"2-digit"})} · ` : "") +
     `revisado ${new Date().toLocaleTimeString("es-MX",{hour:"numeric",minute:"2-digit"})}`;
-  const names = data.sheets.map(s => s.name);
+
+  const months = monthList();
+  if(month !== "todo" && !months.some(m => m.key === month)) month = "todo";
+  $("#months").innerHTML = [{key:"todo",label:"Todo"}, ...months].map(m => `<button class="${m.key===month?"on":""}" data-m="${m.key}">${esc(m.label)}</button>`).join("");
+  $("#months").querySelectorAll("button").forEach(b => b.onclick = () => { month = b.dataset.m; render(); });
+
+  const names = data.sheets.map(x => x.name);
   if(!names.some(n => norm(n) === norm(tab))) tab = names[0];
   $("#tabs").innerHTML = names.map(n => `<button class="${norm(n)===norm(tab)?"on":""}" data-t="${esc(n)}">${esc(n)}</button>`).join("");
   $("#tabs").querySelectorAll("button").forEach(b => b.onclick = () => { tab = b.dataset.t; render(); });
-  const s = sheet(tab), isSum = norm(tab) === "resumen";
-  $("#view").innerHTML = isSum ? summaryView(s) : sheetView(s);
-  if(isSum) drawCharts(s);
+  const sh = sheet(tab), isSum = norm(tab) === "resumen";
+  ROWS = [];
+  $("#view").innerHTML = isSum ? summaryView(sh) : sheetView(sh);
+  if(isSum){ drawCharts(sh); countUp(); }
+  $("#view").querySelectorAll("[data-go]").forEach(k => k.style.cursor = "pointer");
 }
+/* Clics dentro de la vista: tarjetas llevan a su pestaña, filas abren su gráfica por mes */
+$("#view").addEventListener("click", e => {
+  const k = e.target.closest("[data-go]");
+  if(k && sheet(k.dataset.go)){ tab = k.dataset.go; render(); scrollTo({top:0,behavior:"smooth"}); return; }
+  const tr = e.target.closest("tr.row");
+  if(!tr) return;
+  const next = tr.nextElementSibling;
+  if(next && next.classList.contains("detail")){ next.remove(); tr.classList.remove("open"); return; }
+  const r = ROWS[+tr.dataset.r]; if(!r) return;
+  const max = Math.max(...r.vals.map(x=>Math.abs(x.v)), 1);
+  const det = document.createElement("tr"); det.className = "detail";
+  det.innerHTML = `<td colspan="${tr.children.length}"><div class="mini">${r.vals.map(x=>
+    `<span>${esc(x.label)}</span><i class="${x.v<0?"neg":""} ${x.key===month?"sel":""}" data-w="${Math.abs(x.v)/max*100}"></i><b>${r.units?int(x.v):money(x.v)}</b>`).join("")}</div></td>`;
+  tr.after(det); tr.classList.add("open");
+  requestAnimationFrame(()=>det.querySelectorAll("i").forEach(i=>i.style.width=i.dataset.w+"%"));
+});
 
-/* Resumen: KPIs + gráficas + la pestaña completa */
-function summaryView(s){
-  const rows = s.rows, shop = sheet("Shopify"), amz = sheet("Amazon");
-  const {h, total} = monthCols(rows);
-  const T = r => r && total>=0 && isNum(r[total]) ? r[total] : NaN;
-  const T2 = (r, sh) => { if(!r || !sh) return NaN; const t = monthCols(sh.rows).total; return t>=0 && isNum(r[t]) ? r[t] : NaN; };
+/* Resumen en palabras simples: cuánto vendimos, gastamos y ganamos o perdimos */
+function figures(key){
+  const prev = month; month = key;
+  const sh = sheet("Resumen"), shop = sheet("Shopify"), amz = sheet("Amazon"), rows = sh.rows;
+  const pick = (r, src) => { if(!r || !src) return NaN; const c = colFor(src.rows); return c>=0 && isNum(r[c]) ? r[c] : NaN; };
   const add = (a,b) => (isNum(a)?a:0) + (isNum(b)?b:0);
-
-  const shopIng = findRow(rows,"Ingreso comercial","SHOPIFY");
-  const amzIng = findRow(rows,"Ventas netas","AMAZON");
-  const res = findRow(rows,"RESULTADO E-COMMERCE");
-  const shopMkt = T2(shop && findRow(shop.rows,"MARKETING TOTAL"), shop);
-  const amzMkt = T2(amz && findRow(amz.rows,"MARKETING AMAZON TOTAL"), amz);
-  const shopU = T2(shop && findRow(shop.rows,"Total unidades"), shop);
-  const amzU = T2(amz && findRow(amz.rows,"Total unidades vendidas"), amz);
-  const resV = T(res);
+  const f = {
+    shopIng: pick(findRow(rows,"Ingreso comercial","SHOPIFY"), sh),
+    amzIng: pick(findRow(rows,"Ventas netas","AMAZON"), sh),
+    res: pick(findRow(rows,"RESULTADO E-COMMERCE"), sh),
+    shopMkt: pick(shop && findRow(shop.rows,"MARKETING TOTAL"), shop),
+    amzMkt: pick(amz && findRow(amz.rows,"MARKETING AMAZON TOTAL"), amz),
+    shopU: pick(shop && findRow(shop.rows,"Total unidades"), shop),
+    amzU: pick(amz && findRow(amz.rows,"Total unidades vendidas"), amz)
+  };
+  f.sold = add(f.shopIng,f.amzIng); f.ads = add(f.shopMkt,f.amzMkt); f.units = add(f.shopU,f.amzU);
+  month = prev;
+  return f;
+}
+/* Chip "vs mes anterior". upGood: si subir es bueno (ventas) o malo (gasto) */
+function delta(now, before, prevLabel, upGood, fmt){
+  if(!isNum(now) || !isNum(before) || prevLabel == null) return "";
+  const d = now - before;
+  if(Math.abs(d) < 0.5) return `<span class="delta">igual que ${esc(prevLabel)}</span>`;
+  const good = upGood === null ? "" : ((d > 0) === upGood ? "good" : "bad");
+  return `<span class="delta ${good}">${d>0?"▲":"▼"} ${fmt(Math.abs(d))} ${d>0?"más":"menos"} que ${esc(prevLabel)}</span>`;
+}
+function summaryView(sh){
+  const f = figures(month), lost = f.res < 0;
+  const list = monthList(), idx = list.findIndex(x => x.key === month), m = list[idx];
+  const prev = idx > 0 ? list[idx-1] : null, p = prev ? figures(prev.key) : null;
+  const when = m ? `En ${esc(m.full)}` : "En total";
+  const money0 = v => money(v,0);
+  const D = (k, upGood, fmt=money0) => p ? delta(f[k], p[k], prev.label, upGood, fmt) : "";
 
   return `
+    <p class="say">${when} <b>vendimos <span data-count="${f.sold}" data-fmt="money">${money0(f.sold)}</span></b>, gastamos <b>${money0(f.ads)} en publicidad</b> y al final
+      <b class="${lost?"neg":"pos"}">${lost?"perdimos":"ganamos"} ${money0(Math.abs(f.res))}</b>.</p>
     <div class="kpis">
-      <div class="kpi"><small>Ingresos</small><b>${money(add(T(shopIng),T(amzIng)),0)}</b><em>Shopify ${money(T(shopIng),0)} · Amazon ${money(T(amzIng),0)}</em></div>
-      <div class="kpi"><small>Marketing total</small><b>${money(add(shopMkt,amzMkt),0)}</b><em>Shopify ${money(shopMkt,0)} · Amazon ${money(amzMkt,0)}</em></div>
-      <div class="kpi"><small>Unidades vendidas</small><b>${int(add(shopU,amzU))}</b><em>Shopify ${int(shopU)} · Amazon ${int(amzU)}</em></div>
-      <div class="kpi hero"><small>Resultado e-commerce</small><b>${money(resV,0)}</b><em>${resV<0?"pérdida":"ganancia"} después de marketing</em></div>
+      <div class="kpi" data-go="Shopify"><small>Vendimos</small><b data-count="${f.sold}" data-fmt="money">${money0(f.sold)}</b><em>Shopify ${money0(f.shopIng)} · Amazon ${money0(f.amzIng)}</em>${D("sold",true)}</div>
+      <div class="kpi" data-go="Shopify"><small>Gastamos en publicidad</small><b data-count="${f.ads}" data-fmt="money">${money0(f.ads)}</b><em>Shopify ${money0(f.shopMkt)} · Amazon ${money0(f.amzMkt)}</em>${D("ads",false)}</div>
+      <div class="kpi" data-go="Amazon"><small>Productos vendidos</small><b data-count="${f.units}" data-fmt="int">${int(f.units)}</b><em>Shopify ${int(f.shopU)} · Amazon ${int(f.amzU)}</em>${D("units",true,int)}</div>
+      <div class="kpi hero ${lost?"loss":""}"><small>${lost?"Perdimos":"Ganamos"}</small><b data-count="${Math.abs(f.res)}" data-fmt="money">${money0(Math.abs(f.res))}</b><em>después de pagar todo</em>${D("res",true)}</div>
     </div>
-    <p class="period">Periodo: ${esc(h>=0&&total>=0 ? rows[h][total] : "")}. Shopify y Amazon después de todos los costos y el marketing.</p>
+    <p class="period">Incluye Shopify y Amazon después de producto, envíos, comisiones y publicidad.</p>
     <div class="charts">
-      <div class="chart"><h3>Ingresos por mes</h3>
+      <div class="chart"><h3>Cuánto vendimos cada mes</h3>
         <div class="legend"><span><i style="background:var(--pos)"></i>Shopify</span><span><i style="background:var(--amz)"></i>Amazon</span></div>
-        <div id="c-ing"></div><div class="tip"></div></div>
-      <div class="chart"><h3>Resultado e-commerce por mes</h3>
-        <div class="legend"><span><i style="background:var(--pos)"></i>Ganancia</span><span><i style="background:var(--red)"></i>Pérdida</span></div>
-        <div id="c-res"></div><div class="tip"></div></div>
+        <div id="c-ing"></div><div class="tip"></div><p class="hint">Toca una barra para ver ese mes.</p></div>
+      <div class="chart"><h3>Ganamos o perdimos cada mes</h3>
+        <div class="legend"><span><i style="background:var(--pos)"></i>Ganamos</span><span><i style="background:var(--red)"></i>Perdimos</span></div>
+        <div id="c-res"></div><div class="tip"></div><p class="hint">Toca una barra para ver ese mes.</p></div>
     </div>
-    ${sheetView(s)}`;
+    <details class="full"><summary>Ver el resumen completo</summary>${sheetView(sh)}</details>`;
 }
 
-function drawCharts(s){
-  const rows = s.rows, {h, cols} = monthCols(rows);
+/* Números que suben al cambiar de mes */
+function countUp(){
+  document.querySelectorAll("[data-count]").forEach(el => {
+    const to = +el.dataset.count, fmt = el.dataset.fmt === "int" ? int : v => money(v,0);
+    if(!isFinite(to)) return;
+    const t0 = performance.now(), dur = 600;
+    const step = t => { const k = Math.min(1,(t-t0)/dur), e = 1-Math.pow(1-k,3); el.textContent = fmt(to*e); if(k<1) requestAnimationFrame(step); };
+    requestAnimationFrame(step);
+  });
+}
+
+function drawCharts(sh){
+  const rows = sh.rows, {h, cols} = monthCols(rows);
   const shopIng = findRow(rows,"Ingreso comercial","SHOPIFY");
   const amzIng = findRow(rows,"Ventas netas","AMAZON");
   const res = findRow(rows,"RESULTADO E-COMMERCE");
   // Solo meses con alguna cifra capturada
   const months = cols.filter(c => [shopIng,amzIng,res].some(r => r && isNum(r[c]) && r[c] !== 0));
+  const sel = months.findIndex(c => monthKey(rows[h][c]) === month);
   const short = l => String(l).replace(/\s*20\d\d/,"");
   const val = (r,c) => r && isNum(r[c]) ? r[c] : 0;
   barChart($("#c-ing"), months.map(c=>({label:short(rows[h][c]), full:rows[h][c], vals:[
     {v: val(shopIng,c), color:"var(--pos)", name:"Shopify"},
-    {v: val(amzIng,c), color:"var(--amz)", name:"Amazon"}]})));
+    {v: val(amzIng,c), color:"var(--amz)", name:"Amazon"}]})), sel, i => pickMonth(months[i]));
   barChart($("#c-res"), months.map(c=>{ const v = val(res,c); return {label:short(rows[h][c]), full:rows[h][c], vals:[
-    {v, color: v<0?"var(--red)":"var(--pos)", name:"Resultado"}]}; }));
+    {v, color: v<0?"var(--red)":"var(--pos)", name: v<0?"Perdimos":"Ganamos"}]}; }), sel, i => pickMonth(months[i]));
+  function pickMonth(c){ const k = monthKey(rows[h][c]); month = month === k ? "todo" : k; render(); }
 }
 
 /* Barras agrupadas con línea de cero y tooltip */
-function barChart(el, groups){
+function barChart(el, groups, sel = -1, onPick = null){
   if(!el) return;
   if(!groups.length){ el.innerHTML = `<p class="period">Sin datos todavía.</p>`; return; }
   const W=480,H=210,P={l:60,r:8,t:12,b:26};
@@ -394,6 +501,8 @@ function barChart(el, groups){
   const hits = groups.map((gr,i)=>`<rect class="hit" data-i="${i}" x="${P.l+step*i}" y="${P.t}" width="${step}" height="${ih}"/>`).join("");
   el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img">${g}${marks}${hits}</svg>`;
   const tip = el.parentElement.querySelector(".tip"), svg = el.querySelector("svg");
+  const rest = () => svg.querySelectorAll(".mk").forEach(m => m.style.opacity = sel<0 || +m.dataset.g===sel ? 1 : .3);
+  rest();
   svg.querySelectorAll(".hit").forEach(hr=>{
     hr.addEventListener("mouseenter",()=>{
       const i=+hr.dataset.i, gr=groups[i], b=svg.getBoundingClientRect(), sc=b.width/W, pb=el.parentElement.getBoundingClientRect();
@@ -403,7 +512,8 @@ function barChart(el, groups){
       tip.style.top=(b.top-pb.top+top*sc)+"px"; tip.style.opacity=1;
       svg.querySelectorAll(".mk").forEach(m=>m.style.opacity = +m.dataset.g===i ? 1 : .35);
     });
-    hr.addEventListener("mouseleave",()=>{ tip.style.opacity=0; svg.querySelectorAll(".mk").forEach(m=>m.style.opacity=1); });
+    hr.addEventListener("mouseleave",()=>{ tip.style.opacity=0; rest(); });
+    if(onPick) hr.addEventListener("click",()=>onPick(+hr.dataset.i));
   });
 }
 
@@ -431,8 +541,16 @@ function sheetView(s){
   const headRow = head>=0 ? pad(rows[head]) : [];
   const monthCol = headRow.map((v,c)=> c>0 && ph<0 && MONTH.test(String(v)));   // columnas de estatus por mes
   const moneyCol = headRow.map(v => /\$/.test(String(v)));                      // p.ej. "COGS unitario ($)"
+  // Filtro de mes: oculta las columnas de otros meses (y el Total) cuando hay un mes elegido
+  const keep = headRow.map((v,c) => {
+    if(c === 0 || month === "todo") return true;
+    if(monthKey(v)) return monthKey(v) === month;
+    if(ph >= 0 && /total/i.test(String(v))) return false;
+    return true;
+  });
 
   let section = "", body = "", notes = [];
+  const mcols = ph>=0 ? monthCols(rows).cols : [];
   for(let k=i;k<rows.length;k++){
     if(k === head) continue;
     const r = pad(rows[k]);
@@ -446,6 +564,7 @@ function sheetView(s){
     const hasStatus = r.some(v => /^(conciliado|pendiente)/i.test(String(v)));
     const units = !/cogs/i.test(label) && (/unidad/i.test(section) || /unidad|vendidos|bottles|packs$|^merch$/i.test(label));
     const cells = r.map((v,c)=>{
+      if(head>=0 && !keep[c]) return "";
       if(c===0) return `<td>${esc(v)}</td>`;
       if(isNum(v)){
         if(ph<0 && !moneyCol[c]) return `<td>${esc(v)}</td>`;
@@ -455,9 +574,13 @@ function sheetView(s){
       if(/^conciliado$/i.test(v)) return `<td><span class="chip">Conciliado</span></td>`;
       return `<td class="txt">${esc(v)}</td>`;
     }).join("");
-    body += `<tr class="${isTotal(r)?"tot":""}">${cells}</tr>`;
+    // Si la fila tiene cifras en 2+ meses, se puede tocar para ver su gráfica
+    let attr = "";
+    const vals = mcols.filter(c => isNum(r[c])).map(c => ({label: String(rows[head][c]).replace(/\s*20\d\d/,""), key: monthKey(rows[head][c]), v: r[c]}));
+    if(vals.length >= 2){ ROWS.push({vals, units}); attr = ` data-r="${ROWS.length-1}"`; }
+    body += `<tr class="${isTotal(r)?"tot":""}${attr?" row":""}"${attr}>${cells}</tr>`;
   }
-  const thead = head>=0 ? `<thead><tr>${headRow.map(v=>`<th>${esc(v)}</th>`).join("")}</tr></thead>` : "";
+  const thead = head>=0 ? `<thead><tr>${headRow.map((v,c)=> keep[c] ? `<th>${esc(v)}</th>` : "").join("")}</tr></thead>` : "";
   out += `<div class="tbl"><table>${thead}<tbody>${body}</tbody></table></div>`;
   if(notes.length) out += `<div class="notes">${notes.map(n=>`<p><b>${esc(n[0])}</b> ${esc(n.slice(1).filter(v=>!blank(v)).join(" "))}</p>`).join("")}</div>`;
   return out;
