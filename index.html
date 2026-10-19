@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Pipo Perico Reportes</title>
-<meta name="description" content="Reporte de anuncios de Pipo Perico Hot Sauce para Conmigo Brands LLC.">
-<meta name="robots" content="noindex">
+<meta name="description" content="Control de rentabilidad de Pipo Perico Hot Sauce para Conmigo Brands LLC.">
+<meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#fbf6ea">
 <link rel="icon" href="logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,6 +19,8 @@
     --muted:#6b6f63;
     --line:#e7dfcc;
     --green:#1f4d33;
+    --pos:#2f7d4f;
+    --amz:#c97f00;
     --red:#d2372a;
     --sun:#f2a516;
     --cream:#f6e6c4;
@@ -27,70 +29,83 @@
   }
   *{box-sizing:border-box;margin:0;padding:0}
   body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
-  .wrap{max-width:1040px;margin:0 auto;padding:28px 16px 64px}
+  .wrap{max-width:1080px;margin:0 auto;padding:28px 16px 64px}
+  [hidden]{display:none!important}
 
-  .top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:28px}
+  .top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:24px}
   .brand{display:flex;align-items:center;gap:14px}
   .brand img{height:64px;width:auto}
   .brand small{display:block;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
   .brand b{font-family:var(--display);font-weight:400;font-size:22px;color:var(--green);line-height:1.1}
-  .lang{display:flex;border:1px solid var(--green);border-radius:999px;padding:3px;flex-shrink:0}
-  .lang button{font:600 11px var(--sans);letter-spacing:.08em;border:0;background:transparent;color:var(--muted);padding:4px 11px;border-radius:999px;cursor:pointer}
-  .lang button.on{background:var(--green);color:var(--cream)}
+  .btn{font:600 12px var(--sans);border:1px solid var(--green);background:transparent;color:var(--green);border-radius:999px;padding:5px 13px;cursor:pointer}
+  .btn:hover{background:var(--green);color:var(--cream)}
 
-  h1{font-family:var(--display);font-weight:400;font-size:clamp(30px,6vw,48px);line-height:1.05;color:var(--green);margin-bottom:8px}
-  .meta{display:flex;flex-wrap:wrap;align-items:center;gap:10px;color:var(--muted);font-size:13px;margin-bottom:24px}
-  .meta button{font:600 12px var(--sans);border:1px solid var(--green);background:transparent;color:var(--green);border-radius:999px;padding:4px 12px;cursor:pointer}
-  .meta button:hover{background:var(--green);color:var(--cream)}
-  .dot{width:8px;height:8px;border-radius:50%;background:var(--muted);display:inline-block}
-  .dot.live{background:#2e9b5a}
+  h1{font-family:var(--display);font-weight:400;font-size:clamp(28px,5.5vw,46px);line-height:1.05;color:var(--green);margin-bottom:8px}
+  .meta{display:flex;flex-wrap:wrap;align-items:center;gap:10px;color:var(--muted);font-size:13px;margin-bottom:22px}
+  .dot{width:8px;height:8px;border-radius:50%;background:#2e9b5a;display:inline-block;box-shadow:0 0 0 3px rgba(46,155,90,.18)}
 
-  .banner{background:var(--cream);border:1px solid var(--sun);border-radius:12px;padding:12px 16px;font-size:14px;margin-bottom:24px}
-  .banner.err{background:#fde8e5;border-color:var(--red)}
-  .banner[hidden]{display:none}
+  /* Acceso */
+  .gate{max-width:420px;margin:48px auto;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:28px;text-align:center}
+  .gate h2{font-family:var(--display);font-weight:400;color:var(--green);font-size:24px;margin-bottom:6px}
+  .gate p{color:var(--muted);font-size:14px;margin-bottom:18px}
+  .gate form{display:flex;gap:8px}
+  .gate input{flex:1;min-width:0;font:500 15px var(--sans);padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:#fdfaf2}
+  .gate input:focus{outline:2px solid var(--green);outline-offset:1px}
+  .gate button{font:600 14px var(--sans);background:var(--green);color:var(--cream);border:0;border-radius:10px;padding:10px 18px;cursor:pointer}
+  .gate .err{color:var(--red);font-size:13px;margin:12px 0 0}
 
-  .goal{background:var(--green);color:var(--cream);border-radius:16px;padding:20px 22px;margin-bottom:16px}
-  .goal-row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
-  .goal .big{font-family:var(--display);font-size:clamp(40px,8vw,64px);line-height:1}
-  .goal .big span{font-size:.45em;opacity:.75}
-  .goal p{font-size:14px;opacity:.85}
-  .bar{height:12px;background:rgba(246,230,196,.2);border-radius:999px;margin-top:14px;overflow:hidden}
-  .bar i{display:block;height:100%;background:var(--sun);border-radius:999px;width:0;transition:width .6s ease}
+  /* Pestañas */
+  .tabs{display:flex;gap:6px;overflow-x:auto;padding:8px 0 6px;margin-bottom:22px;position:sticky;top:0;background:var(--paper);z-index:5}
+  .tabs button{font:600 13px var(--sans);white-space:nowrap;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:7px 15px;cursor:pointer}
+  .tabs button.on{background:var(--green);border-color:var(--green);color:var(--cream)}
 
-  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:32px}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
   .kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
   .kpi small{display:block;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
   .kpi b{display:block;font-size:26px;font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums}
   .kpi em{font-style:normal;font-size:12px;color:var(--muted)}
+  .kpi.hero{background:var(--green);border-color:var(--green);color:var(--cream)}
+  .kpi.hero small,.kpi.hero em{color:rgba(246,230,196,.8)}
+  .period{color:var(--muted);font-size:13px;margin-bottom:24px}
 
-  h2{font-family:var(--display);font-weight:400;font-size:24px;color:var(--green);margin:0 0 4px}
-  .hint{color:var(--muted);font-size:13px;margin-bottom:14px}
-  section{margin-bottom:36px}
-  .charts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .charts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:32px}
   .chart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;position:relative}
-  .chart h3{font-size:14px;font-weight:600;margin-bottom:8px}
+  .chart h3{font-size:14px;font-weight:600;margin-bottom:4px}
+  .legend{display:flex;gap:14px;font-size:12px;color:var(--muted);margin-bottom:6px}
+  .legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
   .chart svg{width:100%;height:auto;display:block;overflow:visible}
   .chart svg text{font-family:var(--sans);font-size:11px;fill:var(--muted)}
-  .chart .hit{fill:transparent;cursor:default}
+  .chart .hit{fill:transparent}
   .chart .mk{transition:opacity .15s}
-  .tip{position:absolute;pointer-events:none;background:var(--ink);color:#fff;font-size:12px;padding:6px 9px;border-radius:8px;white-space:nowrap;transform:translate(-50%,-110%);opacity:0;transition:opacity .1s}
-  .tip b{display:block;font-weight:600}
+  .tip{position:absolute;pointer-events:none;background:var(--ink);color:#fff;font-size:12px;padding:7px 10px;border-radius:8px;white-space:nowrap;transform:translate(-50%,-105%);opacity:0;transition:opacity .1s;z-index:3}
+  .tip b{display:block;font-weight:600;margin-bottom:2px}
 
-  .tbl{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:14px}
+  /* Tablas del archivo */
+  .tbl{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:16px}
   table{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
-  th,td{text-align:right;padding:10px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
-  th:first-child,td:first-child{text-align:left}
-  th{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;background:#fdfaf2}
-  tr:last-child td{border-bottom:0}
-  tfoot td{font-weight:700;border-top:2px solid var(--line)}
-  .empty{padding:18px;color:var(--muted);font-size:14px}
+  th,td{padding:8px 14px;border-bottom:1px solid #f1ecdf;text-align:right;white-space:nowrap}
+  th:first-child,td:first-child{text-align:left;white-space:normal;min-width:220px}
+  thead th{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;background:#fdfaf2;border-bottom:1px solid var(--line)}
+  tr.grp td{background:var(--green);color:var(--cream);font-weight:700;font-size:12px;letter-spacing:.06em;text-transform:uppercase;padding:7px 14px}
+  tr.tot td{font-weight:700;background:#fff8e1}
+  td.neg{color:var(--red)}
+  td.txt{text-align:left;white-space:normal}
+  td.muted{color:#b8b3a6}
+  .chip{display:inline-block;font-size:11px;font-weight:600;padding:2px 9px;border-radius:999px;background:#e6f2ea;color:#22603c}
+  .chip.pend{background:#f3eee2;color:var(--muted)}
+  .title-row{font-family:var(--display);color:var(--green);font-size:18px;margin:0 0 10px}
+  .notes{background:var(--cream);border-radius:14px;padding:14px 18px;font-size:14px}
+  .notes p{margin:4px 0}
+  .notes b{color:var(--green)}
 
-  footer{border-top:1px solid var(--line);padding-top:16px;font-size:12px;color:var(--muted)}
+  .msg{background:#fde8e5;border:1px solid var(--red);border-radius:12px;padding:12px 16px;font-size:14px;margin-bottom:20px}
+  footer{border-top:1px solid var(--line);padding-top:16px;font-size:12px;color:var(--muted);margin-top:24px}
 
   @media (max-width:760px){
     .kpis{grid-template-columns:repeat(2,1fr)}
     .charts{grid-template-columns:1fr}
     .brand img{height:52px}
+    th:first-child,td:first-child{min-width:170px}
   }
 </style>
 </head>
@@ -102,244 +117,299 @@
       <img src="logo.png" alt="Pipo Perico Hot Sauce">
       <div><small>Conmigo Brands LLC</small><b>Pipo Perico</b></div>
     </div>
-    <div class="lang" role="group" aria-label="Idioma">
-      <button data-lang="es" class="on">ES</button>
-      <button data-lang="en">EN</button>
-    </div>
+    <button class="btn" id="logout" hidden>Salir</button>
   </header>
 
-  <h1 data-i18n="title">Reporte de anuncios</h1>
-  <div class="meta">
-    <span class="dot" id="dot"></span>
-    <span id="status" data-i18n="loading">Cargando datos…</span>
-    <button id="reload" data-i18n="refresh">Actualizar</button>
+  <!-- Acceso con clave -->
+  <div class="gate" id="gate">
+    <h2>Control de rentabilidad</h2>
+    <p>Escribe la clave para ver el reporte.</p>
+    <form id="gate-form">
+      <input id="pw" type="password" placeholder="Clave" autocomplete="current-password" required>
+      <button type="submit">Entrar</button>
+    </form>
+    <p class="err" id="gate-err" hidden></p>
   </div>
 
-  <div class="banner" id="banner" hidden></div>
-
-  <div class="goal">
-    <div class="goal-row">
-      <div class="big" id="g-sales">0 <span>/ 100</span></div>
-      <p id="g-text"></p>
+  <!-- Reporte -->
+  <main id="app" hidden>
+    <h1>Control de rentabilidad</h1>
+    <div class="meta">
+      <span class="dot"></span>
+      <span id="status"></span>
+      <button class="btn" id="reload">Actualizar</button>
     </div>
-    <div class="bar"><i id="g-bar"></i></div>
-  </div>
-
-  <div class="kpis">
-    <div class="kpi"><small data-i18n="k_spend">Inversión</small><b id="k-spend">-</b><em data-i18n="k_spend_n">total en anuncios</em></div>
-    <div class="kpi"><small data-i18n="k_cpa">Costo por venta</small><b id="k-cpa">-</b><em data-i18n="k_cpa_n">inversión ÷ ventas</em></div>
-    <div class="kpi"><small data-i18n="k_roas">ROAS</small><b id="k-roas">-</b><em data-i18n="k_roas_n">ingresos ÷ inversión</em></div>
-    <div class="kpi"><small data-i18n="k_ctr">CTR</small><b id="k-ctr">-</b><em data-i18n="k_ctr_n">clics ÷ impresiones</em></div>
-  </div>
-
-  <section>
-    <h2 data-i18n="s_trend">Por semana</h2>
-    <p class="hint" data-i18n="s_trend_h">Pasa el cursor sobre cada barra o punto para ver el número.</p>
-    <div class="charts">
-      <div class="chart"><h3 data-i18n="c_sales">Ventas por semana</h3><div id="c-sales"></div><div class="tip"></div></div>
-      <div class="chart"><h3 data-i18n="c_cpa">Costo por venta por semana</h3><div id="c-cpa"></div><div class="tip"></div></div>
-    </div>
-  </section>
-
-  <section>
-    <h2 data-i18n="s_weeks">Detalle semanal</h2>
-    <div class="tbl" id="t-weeks"></div>
-  </section>
-
-  <section>
-    <h2 data-i18n="s_ads">Anuncios</h2>
-    <p class="hint" data-i18n="s_ads_h">Ordenados por ventas. El costo por venta más bajo es el mejor.</p>
-    <div class="tbl" id="t-ads"></div>
-  </section>
-
-  <footer data-i18n="foot">Datos tomados en vivo de Google Sheets. Preparado por KOS para Conmigo Brands LLC.</footer>
+    <div class="msg" id="msg" hidden></div>
+    <nav class="tabs" id="tabs"></nav>
+    <div id="view"></div>
+    <footer>Datos en vivo del archivo de control en Google Drive. Se revisa solo cada 2 minutos. Preparado por KOS para Conmigo Brands LLC.</footer>
+  </main>
 </div>
 
 <script>
 /* ================== CONFIGURACIÓN ==================
-   El Google Sheet se queda PRIVADO. Un Apps Script dentro del Sheet
-   (apps-script.gs) entrega solo las pestañas "Semanas" y "Anuncios".
-   1. Pega aquí la URL del Apps Script (termina en /exec). Ver README.md.
-   Para probar sin editar: ?api=URL_DEL_SCRIPT en la URL.                        */
+   URL del Apps Script (termina en /exec). Ver README.md.
+   El archivo de Drive sigue privado: el script lo lee y solo
+   entrega los datos si la clave es correcta.
+   Para probar sin editar: ?api=URL_DEL_SCRIPT                */
 const CONFIG = {
   API_URL: "",
-  TAB_WEEKS: "Semanas",
-  TAB_ADS: "Anuncios",
-  GOAL_SALES: 100,
-  CURRENCY: "USD",
-  REFRESH_MIN: 5
+  REFRESH_MIN: 2
 };
 /* =================================================== */
 
-const T = {
-  es:{title:"Reporte de anuncios",loading:"Cargando datos…",refresh:"Actualizar",
-      k_spend:"Inversión",k_spend_n:"total en anuncios",k_cpa:"Costo por venta",k_cpa_n:"inversión ÷ ventas",
-      k_roas:"ROAS",k_roas_n:"ingresos ÷ inversión",k_ctr:"CTR",k_ctr_n:"clics ÷ impresiones",
-      s_trend:"Por semana",s_trend_h:"Pasa el cursor sobre cada barra o punto para ver el número.",
-      c_sales:"Ventas por semana",c_cpa:"Costo por venta por semana",s_weeks:"Detalle semanal",
-      s_ads:"Anuncios",s_ads_h:"Ordenados por ventas. El costo por venta más bajo es el mejor.",
-      foot:"Datos tomados en vivo de Google Sheets. Preparado por KOS para Conmigo Brands LLC.",
-      goal:(n,g)=>`ventas de la meta de ${g}. Faltan ${Math.max(g-n,0)}.`,
-      goalDone:g=>`¡Meta de ${g} ventas cumplida!`,
-      updated:t=>`Actualizado ${t}`,
-      demo:"<b>Datos de ejemplo.</b> Esta página todavía no está conectada a un Google Sheet, los números de abajo no son reales.",
-      error:"<b>No se pudo leer el Google Sheet.</b> Revisa que el Apps Script esté implementado con acceso “Cualquier persona” y que las pestañas se llamen Semanas y Anuncios.",
-      h:{week:"Semana",spend:"Inversión",sales:"Ventas",revenue:"Ingresos",cpa:"Costo/venta",roas:"ROAS",ctr:"CTR",ad:"Anuncio",clicks:"Clics",impr:"Impresiones",total:"Total"},
-      none:"Sin datos todavía.",sales1:"ventas",cpa1:"costo por venta"},
-  en:{title:"Ad report",loading:"Loading data…",refresh:"Refresh",
-      k_spend:"Spend",k_spend_n:"total on ads",k_cpa:"Cost per sale",k_cpa_n:"spend ÷ sales",
-      k_roas:"ROAS",k_roas_n:"revenue ÷ spend",k_ctr:"CTR",k_ctr_n:"clicks ÷ impressions",
-      s_trend:"By week",s_trend_h:"Hover each bar or point to see the number.",
-      c_sales:"Sales per week",c_cpa:"Cost per sale per week",s_weeks:"Weekly detail",
-      s_ads:"Ads",s_ads_h:"Sorted by sales. The lowest cost per sale is the best.",
-      foot:"Data pulled live from Google Sheets. Prepared by KOS for Conmigo Brands LLC.",
-      goal:(n,g)=>`sales toward the goal of ${g}. ${Math.max(g-n,0)} to go.`,
-      goalDone:g=>`Goal of ${g} sales reached!`,
-      updated:t=>`Updated ${t}`,
-      demo:"<b>Sample data.</b> This page is not connected to a Google Sheet yet, the numbers below are not real.",
-      error:"<b>Could not read the Google Sheet.</b> Check the Apps Script is deployed with access “Anyone” and the tabs are named Semanas and Anuncios.",
-      h:{week:"Week",spend:"Spend",sales:"Sales",revenue:"Revenue",cpa:"Cost/sale",roas:"ROAS",ctr:"CTR",ad:"Ad",clicks:"Clicks",impr:"Impressions",total:"Total"},
-      none:"No data yet.",sales1:"sales",cpa1:"cost per sale"}
-};
-
-let lang = "es", data = null, mode = "demo", loadedAt = null;
-try { if (localStorage.getItem("pp-lang") === "en") lang = "en"; } catch(e) {}
-
-const apiUrl = new URLSearchParams(location.search).get("api") || CONFIG.API_URL;
 const $ = s => document.querySelector(s);
-const money = (v, d=0) => isFinite(v) ? v.toLocaleString(lang==="es"?"es-US":"en-US",{style:"currency",currency:CONFIG.CURRENCY,maximumFractionDigits:d,minimumFractionDigits:d}) : "-";
-const num = v => isFinite(v) ? Math.round(v).toLocaleString(lang==="es"?"es-US":"en-US") : "-";
-const pct = v => isFinite(v) ? (v*100).toFixed(2)+"%" : "-";
-const x2 = v => isFinite(v) ? v.toFixed(2)+"x" : "-";
-const div = (a,b) => b ? a/b : NaN;
-
-/* ---------- Lectura de filas ---------- */
-const norm = s => s.toString().trim().toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z]/g,"");
-const toNum = s => { const v=parseFloat(String(s).replace(/[$,%\s]/g,"")); return isFinite(v)?v:0; };
-
-/* Lee una pestaña y la convierte en objetos con llaves fijas */
-const ALIASES = {
-  week:["semana","week","fecha","date","periodo"],
-  ad:["anuncio","ad","creativo","nombre","name"],
-  spend:["inversion","spend","gasto","amountspent","costo"],
-  sales:["ventas","sales","compras","purchases","conversiones"],
-  revenue:["ingresos","revenue","valor","purchasevalue","ventasusd"],
-  impr:["impresiones","impressions"],
-  clicks:["clics","clicks","clicsenelenlace","linkclicks"]
+const apiUrl = new URLSearchParams(location.search).get("api") || CONFIG.API_URL;
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const norm = s => String(s ?? "").trim().toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9]/g,"");
+const isNum = v => typeof v === "number" && isFinite(v);
+const blank = v => v === "" || v === null || v === undefined;
+const money = (v, dec=2) => {
+  if(!isNum(v)) return "-";
+  const s = Math.abs(v).toLocaleString("en-US",{style:"currency",currency:"USD",minimumFractionDigits:dec,maximumFractionDigits:dec});
+  return v < -0.004 ? `(${s})` : s;
 };
-function toObjects(rows, labelKey){
-  if(!rows || rows.length<2) return [];
-  const head = rows[0].map(norm), idx = {};
-  for(const [k,names] of Object.entries(ALIASES)) idx[k] = head.findIndex(h=>names.includes(h));
-  return rows.slice(1).map(r=>{
-    const o = { label: (r[idx[labelKey]] ?? r[0] ?? "").trim() };
-    for(const k of ["spend","sales","revenue","impr","clicks"]) o[k] = idx[k]>=0 ? toNum(r[idx[k]]) : 0;
-    return o;
-  }).filter(o=>o.label);
-}
-/* ---------- Datos de ejemplo (solo sin Sheet conectado) ---------- */
-function demoData(){
-  const w=[["Sep 22",180,4,96,21000,260],["Sep 29",210,6,150,24500,310],["Oct 6",240,9,221,27800,372],["Oct 13",260,11,268,30100,415]];
-  const a=[["Video 01 Hook picante",210,10,245,25000,330],["Video 04 Tacos",190,8,196,21000,290],["Video 07 Receta",140,5,122,17000,210],["Video 10 Reto",120,4,98,14000,180],["Video 12 Familia",230,3,74,26400,347]];
-  const m=r=>({label:r[0],spend:r[1],sales:r[2],revenue:r[3],impr:r[4],clicks:r[5]});
-  return {weeks:w.map(m), ads:a.map(m)};
+const int = v => isNum(v) ? Math.round(v).toLocaleString("en-US") : "-";
+
+let pw = "", data = null, tab = "Resumen", timer = null;
+try { pw = sessionStorage.getItem("pp-k") || ""; } catch(e) {}
+
+/* ---------- Carga ---------- */
+async function fetchData(key){
+  const url = apiUrl + (apiUrl.includes("?") ? "&" : "?") + "k=" + encodeURIComponent(key) + "&_=" + Date.now();
+  const res = await fetch(url);
+  return res.json();
 }
 
-async function load(){
-  $("#status").textContent = T[lang].loading;
-  if(!apiUrl){ data = demoData(); mode="demo"; loadedAt=new Date(); return render(); }
+async function enter(key){
+  $("#gate-err").hidden = true;
+  if(!apiUrl) return gateError("La página todavía no está conectada al archivo.");
   try{
-    const res = await fetch(apiUrl + (apiUrl.includes("?")?"&":"?") + "_=" + Date.now());
-    const j = await res.json();
-    if(j.error || !j[CONFIG.TAB_WEEKS]) throw new Error(j.error || "missing tab");
-    data = { weeks: toObjects(j[CONFIG.TAB_WEEKS],"week"), ads: toObjects(j[CONFIG.TAB_ADS]||[],"ad") };
-    mode = "live";
-  }catch(e){ console.error(e); mode="error"; data = data || {weeks:[],ads:[]}; }
-  loadedAt = new Date(); render();
+    const j = await fetchData(key);
+    if(j.error === "unauthorized") return gateError("Clave incorrecta.");
+    if(j.error) return gateError("No se pudo leer el archivo: " + j.error);
+    pw = key; try{ sessionStorage.setItem("pp-k", key); }catch(e){}
+    data = j; showApp();
+  }catch(e){ console.error(e); gateError("No se pudo conectar. Intenta de nuevo."); }
+}
+function gateError(t){ const e=$("#gate-err"); e.textContent=t; e.hidden=false; }
+
+async function refresh(){
+  try{
+    const j = await fetchData(pw);
+    if(j.error) throw new Error(j.error);
+    data = j; $("#msg").hidden = true; render();
+  }catch(e){
+    console.error(e);
+    const m=$("#msg"); m.hidden=false; m.textContent="No se pudo actualizar. Se muestran los últimos datos cargados.";
+  }
 }
 
-/* ---------- Gráficas (SVG simple, una serie cada una) ---------- */
-function chart(el, rows, valueOf, fmt, kind){
-  const W=460,H=200,P={l:44,r:8,t:12,b:26};
-  if(!rows.length){ el.innerHTML=`<p class="empty">${T[lang].none}</p>`; return; }
-  const vals = rows.map(valueOf).map(v=>isFinite(v)?v:0);
-  const max = Math.max(...vals,1)*1.1, iw=W-P.l-P.r, ih=H-P.t-P.b, step=iw/rows.length;
-  const y = v => P.t+ih-(v/max)*ih;
-  let g="";
-  for(let i=0;i<=3;i++){ const v=max*i/3, yy=y(v); g+=`<line x1="${P.l}" x2="${W-P.r}" y1="${yy}" y2="${yy}" stroke="#ece6d6"/><text x="${P.l-6}" y="${yy+4}" text-anchor="end">${fmt(v,true)}</text>`; }
-  const every = Math.ceil(rows.length/8);
-  rows.forEach((r,i)=>{ if(i%every===0) g+=`<text x="${P.l+step*i+step/2}" y="${H-8}" text-anchor="middle">${r.label}</text>`; });
-  let marks="";
-  if(kind==="bar"){
-    const bw=Math.min(36,step*.6);
-    rows.forEach((r,i)=>{ const x=P.l+step*i+(step-bw)/2, yy=y(vals[i]), h=P.t+ih-yy;
-      marks+=`<path class="mk" d="M${x},${P.t+ih}V${yy+Math.min(4,h)}q0,-4 4,-4h${bw-8}q4,0 4,4V${P.t+ih}Z" fill="#1f4d33"/>`; });
-  }else{
-    const pts = rows.map((r,i)=>[P.l+step*i+step/2, y(vals[i])]);
-    marks+=`<polyline points="${pts.map(p=>p.join(",")).join(" ")}" fill="none" stroke="#d2372a" stroke-width="2" stroke-linejoin="round"/>`;
-    pts.forEach(p=>marks+=`<circle class="mk" cx="${p[0]}" cy="${p[1]}" r="4.5" fill="#d2372a" stroke="#fff" stroke-width="2"/>`);
+function showApp(){
+  $("#gate").hidden = true; $("#app").hidden = false; $("#logout").hidden = false;
+  render();
+  clearInterval(timer); timer = setInterval(refresh, CONFIG.REFRESH_MIN*60*1000);
+}
+
+$("#gate-form").addEventListener("submit", e => { e.preventDefault(); enter($("#pw").value); });
+$("#reload").addEventListener("click", refresh);
+$("#logout").addEventListener("click", () => { try{ sessionStorage.removeItem("pp-k"); }catch(e){} location.reload(); });
+document.addEventListener("visibilitychange", () => { if(!document.hidden && data) refresh(); });
+
+/* ---------- Lectura del archivo ---------- */
+const sheet = name => data.sheets.find(s => norm(s.name) === norm(name));
+const isSection = r => !blank(r[0]) && r.slice(1).every(blank) && String(r[0]) === String(r[0]).toUpperCase() && /[A-Z]/.test(String(r[0]));
+const isTotal = r => { const a=String(r[0]??""); return a === a.toUpperCase() && /[A-Z]/.test(a) && r.slice(1).some(isNum); };
+
+/* Fila de encabezados de periodos (Junio 2026, Julio 2026, ..., Total) */
+function periodHeader(rows){
+  for(let i=0;i<Math.min(rows.length,6);i++){
+    if(rows[i].slice(1).filter(v => /20\d\d|total/i.test(String(v))).length >= 2) return i;
   }
-  const hits = rows.map((r,i)=>`<rect class="hit" data-i="${i}" x="${P.l+step*i}" y="${P.t}" width="${step}" height="${ih}"/>`).join("");
+  return -1;
+}
+function monthCols(rows){
+  const h = periodHeader(rows); if(h<0) return {h, cols:[], total:-1};
+  const cols=[]; let total=-1;
+  rows[h].forEach((v,i)=>{ if(i===0||blank(v)) return; if(/total/i.test(v)) total=i; else cols.push(i); });
+  return {h, cols, total};
+}
+/* Busca una fila por etiqueta, opcionalmente dentro de una sección */
+function findRow(rows, label, section){
+  let inSec = !section;
+  for(const r of rows){
+    if(section && isSection(r)) inSec = norm(r[0]) === norm(section);
+    if(inSec && norm(r[0]) === norm(label)) return r;
+  }
+  return null;
+}
+
+/* ---------- Vistas ---------- */
+function render(){
+  const upd = data.updated ? new Date(data.updated) : null;
+  $("#status").textContent = (upd ? `Archivo modificado ${upd.toLocaleString("es-MX",{day:"numeric",month:"short",hour:"numeric",minute:"2-digit"})} · ` : "") +
+    `revisado ${new Date().toLocaleTimeString("es-MX",{hour:"numeric",minute:"2-digit"})}`;
+  const names = data.sheets.map(s => s.name);
+  if(!names.some(n => norm(n) === norm(tab))) tab = names[0];
+  $("#tabs").innerHTML = names.map(n => `<button class="${norm(n)===norm(tab)?"on":""}" data-t="${esc(n)}">${esc(n)}</button>`).join("");
+  $("#tabs").querySelectorAll("button").forEach(b => b.onclick = () => { tab = b.dataset.t; render(); });
+  const s = sheet(tab), isSum = norm(tab) === "resumen";
+  $("#view").innerHTML = isSum ? summaryView(s) : sheetView(s);
+  if(isSum) drawCharts(s);
+}
+
+/* Resumen: KPIs + gráficas + la pestaña completa */
+function summaryView(s){
+  const rows = s.rows, shop = sheet("Shopify"), amz = sheet("Amazon");
+  const {h, total} = monthCols(rows);
+  const T = r => r && total>=0 && isNum(r[total]) ? r[total] : NaN;
+  const T2 = (r, sh) => { if(!r || !sh) return NaN; const t = monthCols(sh.rows).total; return t>=0 && isNum(r[t]) ? r[t] : NaN; };
+  const add = (a,b) => (isNum(a)?a:0) + (isNum(b)?b:0);
+
+  const shopIng = findRow(rows,"Ingreso comercial","SHOPIFY");
+  const amzIng = findRow(rows,"Ventas netas","AMAZON");
+  const res = findRow(rows,"RESULTADO E-COMMERCE");
+  const shopMkt = T2(shop && findRow(shop.rows,"MARKETING TOTAL"), shop);
+  const amzMkt = T2(amz && findRow(amz.rows,"MARKETING AMAZON TOTAL"), amz);
+  const shopU = T2(shop && findRow(shop.rows,"Total unidades"), shop);
+  const amzU = T2(amz && findRow(amz.rows,"Total unidades vendidas"), amz);
+  const resV = T(res);
+
+  return `
+    <div class="kpis">
+      <div class="kpi"><small>Ingresos</small><b>${money(add(T(shopIng),T(amzIng)),0)}</b><em>Shopify ${money(T(shopIng),0)} · Amazon ${money(T(amzIng),0)}</em></div>
+      <div class="kpi"><small>Marketing total</small><b>${money(add(shopMkt,amzMkt),0)}</b><em>Shopify ${money(shopMkt,0)} · Amazon ${money(amzMkt,0)}</em></div>
+      <div class="kpi"><small>Unidades vendidas</small><b>${int(add(shopU,amzU))}</b><em>Shopify ${int(shopU)} · Amazon ${int(amzU)}</em></div>
+      <div class="kpi hero"><small>Resultado e-commerce</small><b>${money(resV,0)}</b><em>${resV<0?"pérdida":"ganancia"} después de marketing</em></div>
+    </div>
+    <p class="period">Periodo: ${esc(h>=0&&total>=0 ? rows[h][total] : "")}. Shopify y Amazon después de todos los costos y el marketing.</p>
+    <div class="charts">
+      <div class="chart"><h3>Ingresos por mes</h3>
+        <div class="legend"><span><i style="background:var(--pos)"></i>Shopify</span><span><i style="background:var(--amz)"></i>Amazon</span></div>
+        <div id="c-ing"></div><div class="tip"></div></div>
+      <div class="chart"><h3>Resultado e-commerce por mes</h3>
+        <div class="legend"><span><i style="background:var(--pos)"></i>Ganancia</span><span><i style="background:var(--red)"></i>Pérdida</span></div>
+        <div id="c-res"></div><div class="tip"></div></div>
+    </div>
+    ${sheetView(s)}`;
+}
+
+function drawCharts(s){
+  const rows = s.rows, {h, cols} = monthCols(rows);
+  const shopIng = findRow(rows,"Ingreso comercial","SHOPIFY");
+  const amzIng = findRow(rows,"Ventas netas","AMAZON");
+  const res = findRow(rows,"RESULTADO E-COMMERCE");
+  // Solo meses con alguna cifra capturada
+  const months = cols.filter(c => [shopIng,amzIng,res].some(r => r && isNum(r[c]) && r[c] !== 0));
+  const short = l => String(l).replace(/\s*20\d\d/,"");
+  const val = (r,c) => r && isNum(r[c]) ? r[c] : 0;
+  barChart($("#c-ing"), months.map(c=>({label:short(rows[h][c]), full:rows[h][c], vals:[
+    {v: val(shopIng,c), color:"var(--pos)", name:"Shopify"},
+    {v: val(amzIng,c), color:"var(--amz)", name:"Amazon"}]})));
+  barChart($("#c-res"), months.map(c=>{ const v = val(res,c); return {label:short(rows[h][c]), full:rows[h][c], vals:[
+    {v, color: v<0?"var(--red)":"var(--pos)", name:"Resultado"}]}; }));
+}
+
+/* Barras agrupadas con línea de cero y tooltip */
+function barChart(el, groups){
+  if(!el) return;
+  if(!groups.length){ el.innerHTML = `<p class="period">Sin datos todavía.</p>`; return; }
+  const W=480,H=210,P={l:60,r:8,t:12,b:26};
+  const all = groups.flatMap(g=>g.vals.map(x=>x.v));
+  let max=Math.max(0,...all), min=Math.min(0,...all);
+  const pad=(max-min)*.1||1; if(max>0) max+=pad; if(min<0) min-=pad;
+  const iw=W-P.l-P.r, ih=H-P.t-P.b, step=iw/groups.length;
+  const y = v => P.t + (max-v)/(max-min)*ih;
+  let g="";
+  for(let i=0;i<=4;i++){ const v=min+(max-min)*i/4, yy=y(v);
+    g+=`<line x1="${P.l}" x2="${W-P.r}" y1="${yy}" y2="${yy}" stroke="#efe9db"/><text x="${P.l-6}" y="${yy+4}" text-anchor="end">${money(v,0)}</text>`; }
+  g+=`<line x1="${P.l}" x2="${W-P.r}" y1="${y(0)}" y2="${y(0)}" stroke="#9c978a"/>`;
+  let marks="";
+  groups.forEach((gr,i)=>{
+    g+=`<text x="${P.l+step*i+step/2}" y="${H-8}" text-anchor="middle">${esc(gr.label)}</text>`;
+    const n=gr.vals.length, bw=Math.min(34,step*.7/n), gap=2, gw=n*bw+(n-1)*gap, x0=P.l+step*i+(step-gw)/2;
+    gr.vals.forEach((s,j)=>{
+      const x=x0+j*(bw+gap), y0=y(0), y1=y(s.v), hh=Math.abs(y1-y0), r=Math.min(4,hh,bw/2);
+      const d = s.v>=0
+        ? `M${x},${y0}V${y1+r}q0,-${r} ${r},-${r}h${bw-2*r}q${r},0 ${r},${r}V${y0}Z`
+        : `M${x},${y0}V${y1-r}q0,${r} ${r},${r}h${bw-2*r}q${r},0 ${r},-${r}V${y0}Z`;
+      marks+=`<path class="mk" data-g="${i}" d="${d}" fill="${s.color}"/>`;
+    });
+  });
+  const hits = groups.map((gr,i)=>`<rect class="hit" data-i="${i}" x="${P.l+step*i}" y="${P.t}" width="${step}" height="${ih}"/>`).join("");
   el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img">${g}${marks}${hits}</svg>`;
   const tip = el.parentElement.querySelector(".tip"), svg = el.querySelector("svg");
-  svg.querySelectorAll(".hit").forEach(h=>{
-    h.addEventListener("mouseenter",()=>{
-      const i=+h.dataset.i, b=svg.getBoundingClientRect(), s=b.width/W, pb=el.parentElement.getBoundingClientRect();
-      tip.innerHTML=`<b>${rows[i].label}</b>${fmt(vals[i])}`;
-      tip.style.left=(b.left-pb.left+(P.l+step*i+step/2)*s)+"px";
-      tip.style.top=(b.top-pb.top+y(vals[i])*s)+"px";
-      tip.style.opacity=1;
-      svg.querySelectorAll(".mk").forEach((m,j)=>m.style.opacity=j===i?1:.35);
+  svg.querySelectorAll(".hit").forEach(hr=>{
+    hr.addEventListener("mouseenter",()=>{
+      const i=+hr.dataset.i, gr=groups[i], b=svg.getBoundingClientRect(), sc=b.width/W, pb=el.parentElement.getBoundingClientRect();
+      tip.innerHTML = `<b>${esc(gr.full)}</b>` + gr.vals.map(x=>`${esc(x.name)}: ${money(x.v)}`).join("<br>");
+      const top = Math.min(...gr.vals.map(x=>y(Math.max(0,x.v))));
+      tip.style.left=(b.left-pb.left+(P.l+step*i+step/2)*sc)+"px";
+      tip.style.top=(b.top-pb.top+top*sc)+"px"; tip.style.opacity=1;
+      svg.querySelectorAll(".mk").forEach(m=>m.style.opacity = +m.dataset.g===i ? 1 : .35);
     });
-    h.addEventListener("mouseleave",()=>{ tip.style.opacity=0; svg.querySelectorAll(".mk").forEach(m=>m.style.opacity=1); });
+    hr.addEventListener("mouseleave",()=>{ tip.style.opacity=0; svg.querySelectorAll(".mk").forEach(m=>m.style.opacity=1); });
   });
 }
 
-/* ---------- Tablas ---------- */
-function table(el, rows, labelHead, sortBySales){
-  const h=T[lang].h;
-  if(!rows.length){ el.innerHTML=`<p class="empty">${T[lang].none}</p>`; return; }
-  const list = sortBySales ? [...rows].sort((a,b)=>b.sales-a.sales) : rows;
-  const tr = r => `<td>${r.label}</td><td>${money(r.spend)}</td><td>${num(r.sales)}</td><td>${money(r.revenue)}</td><td>${money(div(r.spend,r.sales),2)}</td><td>${x2(div(r.revenue,r.spend))}</td><td>${num(r.impr)}</td><td>${num(r.clicks)}</td><td>${pct(div(r.clicks,r.impr))}</td>`;
-  const tot = rows.reduce((t,r)=>{ for(const k of ["spend","sales","revenue","impr","clicks"]) t[k]+=r[k]; return t; },{label:h.total,spend:0,sales:0,revenue:0,impr:0,clicks:0});
-  el.innerHTML = `<table><thead><tr><th>${labelHead}</th><th>${h.spend}</th><th>${h.sales}</th><th>${h.revenue}</th><th>${h.cpa}</th><th>${h.roas}</th><th>${h.impr}</th><th>${h.clicks}</th><th>${h.ctr}</th></tr></thead><tbody>${list.map(r=>`<tr>${tr(r)}</tr>`).join("")}</tbody><tfoot><tr>${tr(tot)}</tr></tfoot></table>`;
+/* Cualquier pestaña del archivo, tal cual, con formato.
+   Si agregan meses, filas o pestañas nuevas, aparecen solas. */
+const MONTH = /^(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)/i;
+function sheetView(s){
+  if(!s || !s.rows.length) return `<p class="period">Esta pestaña está vacía.</p>`;
+  const rows = s.rows, width = Math.max(...rows.map(r=>r.length));
+  const pad = r => { const o=r.slice(); while(o.length<width) o.push(""); return o; };
+  const ph = periodHeader(rows);
+  let out = "", i = 0;
+
+  // Título en la primera fila
+  if(!blank(rows[0][0]) && rows[0].slice(1).every(blank)){ out += `<p class="title-row">${esc(rows[0][0])}</p>`; i = 1; }
+  // Instrucciones largas en una sola celda
+  while(i < rows.length && i !== ph && !blank(rows[i][0]) && rows[i].slice(1).every(blank) && String(rows[i][0]).length > 60){
+    out += `<p class="period">${esc(rows[i][0])}</p>`; i++;
+  }
+  // Encabezado: fila de periodos, o la primera fila con varias celdas de texto
+  let head = ph;
+  if(head < 0){
+    for(let k=i;k<rows.length;k++){ const f=rows[k].filter(v=>!blank(v)); if(f.length>=2 && f.every(v=>typeof v==="string")){ head=k; break; } }
+  }
+  const headRow = head>=0 ? pad(rows[head]) : [];
+  const monthCol = headRow.map((v,c)=> c>0 && ph<0 && MONTH.test(String(v)));   // columnas de estatus por mes
+  const moneyCol = headRow.map(v => /\$/.test(String(v)));                      // p.ej. "COGS unitario ($)"
+
+  let section = "", body = "", notes = [];
+  for(let k=i;k<rows.length;k++){
+    if(k === head) continue;
+    const r = pad(rows[k]);
+    if(r.every(blank)) continue;
+    if(isSection(r)){
+      section = String(r[0]);
+      if(/^notas/i.test(section)){ for(k=k+1;k<rows.length;k++){ if(!rows[k].every(blank)) notes.push(rows[k]); } break; }
+      body += `<tr class="grp"><td colspan="${width}">${esc(section)}</td></tr>`; continue;
+    }
+    const label = String(r[0] ?? "");
+    const hasStatus = r.some(v => /^(conciliado|pendiente)/i.test(String(v)));
+    const units = !/cogs/i.test(label) && (/unidad/i.test(section) || /unidad|vendidos|bottles|packs$|^merch$/i.test(label));
+    const cells = r.map((v,c)=>{
+      if(c===0) return `<td>${esc(v)}</td>`;
+      if(isNum(v)){
+        if(ph<0 && !moneyCol[c]) return `<td>${esc(v)}</td>`;
+        return `<td class="${v<-0.004?"neg":""}">${units ? int(v) : money(v)}</td>`;
+      }
+      if(blank(v)) return monthCol[c] && hasStatus ? `<td><span class="chip pend">Pendiente</span></td>` : `<td class="muted">${ph>=0?"-":""}</td>`;
+      if(/^conciliado$/i.test(v)) return `<td><span class="chip">Conciliado</span></td>`;
+      return `<td class="txt">${esc(v)}</td>`;
+    }).join("");
+    body += `<tr class="${isTotal(r)?"tot":""}">${cells}</tr>`;
+  }
+  const thead = head>=0 ? `<thead><tr>${headRow.map(v=>`<th>${esc(v)}</th>`).join("")}</tr></thead>` : "";
+  out += `<div class="tbl"><table>${thead}<tbody>${body}</tbody></table></div>`;
+  if(notes.length) out += `<div class="notes">${notes.map(n=>`<p><b>${esc(n[0])}</b> ${esc(n.slice(1).filter(v=>!blank(v)).join(" "))}</p>`).join("")}</div>`;
+  return out;
 }
 
-function render(){
-  const t=T[lang];
-  document.documentElement.lang=lang;
-  document.querySelectorAll("[data-i18n]").forEach(e=>{ const v=t[e.dataset.i18n]; if(typeof v==="string") e.textContent=v; });
-  document.querySelectorAll(".lang button").forEach(b=>b.classList.toggle("on",b.dataset.lang===lang));
-  if(!data) return;
-
-  const b=$("#banner");
-  b.hidden = mode==="live"; b.className = "banner"+(mode==="error"?" err":"");
-  b.innerHTML = mode==="error" ? t.error : t.demo;
-  $("#dot").className = "dot"+(mode==="live"?" live":"");
-  $("#status").textContent = loadedAt ? t.updated(loadedAt.toLocaleTimeString(lang==="es"?"es-MX":"en-US",{hour:"numeric",minute:"2-digit"})) : t.loading;
-
-  const W=data.weeks, sum=k=>W.reduce((s,r)=>s+r[k],0);
-  const spend=sum("spend"), sales=sum("sales"), rev=sum("revenue"), impr=sum("impr"), clicks=sum("clicks"), G=CONFIG.GOAL_SALES;
-  $("#g-sales").innerHTML = `${num(sales)} <span>/ ${G}</span>`;
-  $("#g-text").textContent = sales>=G ? t.goalDone(G) : t.goal(sales,G);
-  $("#g-bar").style.width = Math.min(100, sales/G*100)+"%";
-  $("#k-spend").textContent = money(spend);
-  $("#k-cpa").textContent = money(div(spend,sales),2);
-  $("#k-roas").textContent = x2(div(rev,spend));
-  $("#k-ctr").textContent = pct(div(clicks,impr));
-
-  chart($("#c-sales"), W, r=>r.sales, (v,ax)=> ax ? num(v) : `${num(v)} ${t.sales1}`, "bar");
-  chart($("#c-cpa"), W, r=>div(r.spend,r.sales), (v,ax)=> ax ? money(v) : `${money(v,2)} ${t.cpa1}`, "line");
-  table($("#t-weeks"), W, t.h.week, false);
-  table($("#t-ads"), data.ads, t.h.ad, true);
-}
-
-document.querySelectorAll(".lang button").forEach(b=>b.addEventListener("click",()=>{
-  lang=b.dataset.lang; try{localStorage.setItem("pp-lang",lang);}catch(e){} render();
-}));
-$("#reload").addEventListener("click", load);
-load();
-setInterval(load, CONFIG.REFRESH_MIN*60*1000);
+/* Si ya hay clave guardada en esta pestaña, entra directo */
+if(pw && apiUrl) enter(pw);
 </script>
 </body>
 </html>

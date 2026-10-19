@@ -1,36 +1,34 @@
 # Pipo Perico Reportes
 
-Reporte público de anuncios de Pipo Perico Hot Sauce (Conmigo Brands LLC).
+Control de rentabilidad de Pipo Perico Hot Sauce (Conmigo Brands LLC), con clave.
 Live: https://jesusmlpd.github.io/pipo-perico-reportes/
 
-Una sola página (`index.html`) que lee un Google Sheet en vivo cada vez que se abre
-(y cada 5 minutos). Push a `main` = deploy (GitHub Pages).
+Una sola página (`index.html`). No contiene números: los pide a un Apps Script que lee
+el archivo de control en Google Drive (el `.xlsm`) y solo responde con la clave correcta.
+El archivo de Drive puede quedar **Restringido**. Push a `main` = deploy (GitHub Pages).
 
-## Conectar el Google Sheet (se queda privado)
+## En vivo
 
-El Sheet NO se comparte. Un Apps Script dentro del Sheet entrega solo las pestañas
-**Semanas** y **Anuncios** a la página. Nadie puede abrir el Sheet ni ver otras pestañas.
+- Cualquier cambio al archivo en Drive aparece en la página en máximo 2 minutos
+  (o al dar "Actualizar"). El script compara la fecha de modificación y solo relee si cambió.
+- Muestra todas las pestañas visibles. Meses, filas o pestañas nuevas aparecen solas.
+- Si se sube una versión nueva del Excel, usar "Gestionar versiones" o reemplazar el
+  archivo existente para que el ID no cambie. Si cambia, actualizar `FILE_ID` en el script.
 
-1. Crea el Sheet con dos pestañas llamadas exactamente **Semanas** y **Anuncios**.
-   Puedes importar `plantillas/Semanas.csv` y `plantillas/Anuncios.csv`
-   (Archivo > Importar > Subir > "Insertar hojas nuevas").
-2. Columnas (fila 1), sin importar mayúsculas ni acentos:
-   - Semanas: `Semana | Inversion | Ventas | Ingresos | Impresiones | Clics`
-   - Anuncios: `Anuncio | Inversion | Ventas | Ingresos | Impresiones | Clics`
-3. En el Sheet: **Extensiones > Apps Script**. Borra lo que haya y pega `apps-script.gs`. Guarda.
-4. **Implementar > Nueva implementación** > tipo **Aplicación web**:
-   - Ejecutar como: **Yo**
-   - Quién tiene acceso: **Cualquier persona**
-   Autoriza con tu cuenta (Google avisa "app no verificada": Avanzado > Ir al proyecto).
-5. Copia la URL que termina en `/exec`.
-6. Prueba: `https://jesusmlpd.github.io/pipo-perico-reportes/?api=<URL>`
-7. Pega la URL en `CONFIG.API_URL` de `index.html` y haz push.
+## Conectar (una vez)
+
+1. Entra a https://script.google.com con la cuenta que tiene el archivo > **Nuevo proyecto**.
+   Nómbralo "Pipo Perico Reportes".
+2. Borra el contenido y pega `apps-script.gs`. Guarda.
+3. A la izquierda, **Servicios (+) > Drive API** > Agregar (deja la versión v3).
+4. **Configuración del proyecto (engrane) > Propiedades de la secuencia de comandos** >
+   agrega `PASSWORD` con la clave que darás al cliente.
+5. Arriba elige la función `prueba` > **Ejecutar**. Autoriza (Google dirá "app no verificada":
+   Avanzado > Ir a Pipo Perico Reportes). En el registro deben salir las 5 pestañas.
+6. **Implementar > Nueva implementación** > tipo **Aplicación web**:
+   Ejecutar como **Yo**, Quién tiene acceso **Cualquier persona**. Copia la URL `/exec`.
+7. Prueba: `https://jesusmlpd.github.io/pipo-perico-reportes/?api=<URL>` y entra con la clave.
+8. Pega la URL en `CONFIG.API_URL` de `index.html` y haz push.
 
 Si cambias el código del script: Implementar > Gestionar implementaciones > editar >
-Versión nueva (así la URL no cambia).
-
-La página calcula sola: costo por venta, ROAS, CTR, total y avance a la meta
-(`CONFIG.GOAL_SALES`, 100 ventas).
-
-Ojo: los números de Semanas y Anuncios sí quedan visibles en la página pública.
-No metas datos privados en esas dos pestañas; todo lo demás del Sheet queda privado.
+Versión nueva (la URL no cambia). Para cambiar la clave basta editar `PASSWORD`.
